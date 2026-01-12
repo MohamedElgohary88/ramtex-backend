@@ -1,0 +1,435 @@
+@import "tailwindcss";
+
+@config "../../../../tailwind.config.js";
+
+/*
+ * ============================================
+ * RAMTEX ERP - Modern SaaS Theme
+ * Supports Light & Dark Mode
+ * ============================================
+ */
+
+/* ====== CSS VARIABLES ====== */
+:root {
+    --brand-primary: #f59e0b;
+    --brand-primary-dark: #d97706;
+    --brand-glow: rgba(245, 158, 11, 0.15);
+    
+    --surface-base: #f4f4f5;
+    --surface-elevated: #ffffff;
+    --surface-card: #ffffff;
+    --surface-hover: #f4f4f5;
+    
+    --text-primary: #18181b;
+    --text-secondary: #52525b;
+    --text-muted: #a1a1aa;
+    
+    --border-subtle: #e4e4e7;
+    --border-default: #d4d4d8;
+    --border-strong: #a1a1aa;
+}
+
+.dark {
+    --surface-base: #09090b;
+    --surface-elevated: #18181b;
+    --surface-card: #1f1f23;
+    --surface-hover: #27272a;
+    
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+    
+    --border-subtle: #27272a;
+    --border-default: #3f3f46;
+    --border-strong: #52525b;
+}
+
+/* ====== GLOBAL ====== */
+body, .fi-body {
+    background-color: var(--surface-base) !important;
+}
+
+/* ====== SIDEBAR ====== */
+.fi-sidebar {
+    background: var(--surface-elevated) !important;
+    border-right: 1px solid var(--border-subtle) !important;
+}
+
+.dark .fi-sidebar {
+    background: #111113 !important;
+}
+
+.fi-sidebar-header {
+    padding: 1.25rem 1rem !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+/* Sidebar Nav */
+.fi-sidebar-nav {
+    padding: 0.75rem !important;
+}
+
+/* Sidebar Items */
+.fi-sidebar-item {
+    border-radius: 0.5rem !important;
+    margin-bottom: 2px !important;
+}
+
+.fi-sidebar-item-button {
+    padding: 0.625rem 0.75rem !important;
+    gap: 0.75rem !important;
+}
+
+.fi-sidebar-item-icon {
+    width: 1.5rem !important; /* Larger icons (24px) */
+    height: 1.5rem !important;
+    color: var(--text-muted) !important;
+    flex-shrink: 0 !important;
+}
+
+.fi-sidebar-item-label {
+    color: var(--text-secondary) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+}
+
+.fi-sidebar-item:hover {
+    background: var(--surface-hover) !important;
+}
+
+.fi-sidebar-item:hover .fi-sidebar-item-icon,
+.fi-sidebar-item:hover .fi-sidebar-item-label {
+    color: var(--text-primary) !important;
+}
+
+/* Active Sidebar Item */
+.fi-sidebar-item.fi-active {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.08) 100%) !important;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    color: var(--brand-primary) !important;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-label {
+    color: var(--brand-primary) !important;
+    font-weight: 600 !important;
+}
+
+/* Sidebar Groups */
+.fi-sidebar-group-label {
+    color: var(--text-muted) !important;
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    padding: 1rem 0.75rem 0.5rem !important;
+}
+
+/* ====== TOPBAR ====== */
+.fi-topbar {
+    background: var(--surface-elevated) !important;
+    border-bottom: 1px solid rgb(229, 231, 235) !important; /* gray-200 force */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+    z-index: 20 !important;
+}
+
+.dark .fi-topbar {
+    border-color: rgb(39, 39, 42) !important; /* zinc-800 */
+}
+
+/* ====== CHECKBOXES ====== */
+/* Force checkbox checked state to use brand color */
+input[type="checkbox"]:checked {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: white !important;
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e") !important;
+}
+
+/* Add support for primary-600 variable if it exists in scope, otherwise fallback to brand-primary */
+@supports (color: rgb(var(--primary-600))) {
+    input[type="checkbox"]:checked {
+        background-color: rgb(var(--primary-600)) !important;
+        border-color: rgb(var(--primary-600)) !important;
+    }
+}
+
+/* focus ring for checkboxes */
+input[type="checkbox"]:focus {
+    --tw-ring-color: var(--brand-glow) !important;
+    --tw-ring-opacity: 1 !important;
+    --tw-ring-width: 2px !important;
+    outline: 2px solid transparent !important;
+    outline-offset: 2px !important;
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), 0 0 0 2px var(--brand-glow) !important;
+}
+
+/* ====== MAIN CONTENT ====== */
+.fi-main {
+    background: var(--surface-base) !important;
+}
+
+.fi-main-ctn {
+    padding: 1.5rem !important;
+}
+
+/* ====== FORMS - FULL WIDTH FIX ====== */
+/* Force all form containers to use full width */
+.fi-fo,
+.fi-form,
+.fi-fo-component-ctn,
+.fi-fo-field-wrp,
+.fi-section,
+.fi-section-content,
+.fi-section-content-ctn {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Page container width fixes */
+.fi-page > div,
+.fi-page-create > div,
+.fi-page-edit > div {
+    max-width: 100% !important;
+}
+
+/* Main content wrapper full width */
+.fi-main > div,
+.fi-main-ctn > div {
+    max-width: 100% !important;
+}
+
+/* Filament's form container */
+[class*="fi-resource"] .fi-form-component {
+    max-width: 100% !important;
+}
+
+/* Simple page wrapper for create/edit */
+.fi-simple-ctn {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Override any mx-auto centering on forms */
+.fi-page form {
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* ====== CARDS & SECTIONS ====== */
+.fi-section {
+    background: var(--surface-card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+.dark .fi-section {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.fi-section-header {
+    padding: 1rem 1.25rem !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+.fi-section-header-heading {
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
+}
+
+.fi-section-content {
+    padding: 1.25rem !important;
+}
+
+/* ====== INPUTS ====== */
+.fi-input-wrp {
+    background: var(--surface-elevated) !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: 0.5rem !important;
+    transition: all 0.15s ease !important;
+    padding: 0.1em 0 !important; /* Slightly roomier */
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.fi-input {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+}
+
+.dark .fi-input-wrp {
+    background: var(--surface-card) !important;
+}
+
+.fi-input-wrp:focus-within {
+    border-color: var(--brand-primary) !important;
+    box-shadow: 0 0 0 3px var(--brand-glow) !important;
+}
+
+/* ====== SELECTS ====== */
+.fi-select-input {
+    padding-left: 0.75rem !important;
+}
+
+/* ====== TABLES ====== */
+.fi-ta {
+    background: var(--surface-card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 0.75rem !important;
+    overflow: hidden !important;
+}
+
+.fi-ta-header-cell {
+    background: var(--surface-base) !important;
+    color: var(--text-muted) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    padding: 0.875rem 1rem !important;
+}
+
+.dark .fi-ta-header-cell {
+    background: var(--surface-elevated) !important;
+}
+
+.fi-ta-row {
+    border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+.fi-ta-row:hover {
+    background: var(--surface-hover) !important;
+}
+
+.fi-ta-cell {
+    padding: 0.875rem 1rem !important;
+    color: var(--text-primary) !important;
+}
+
+/* ====== WIDGETS ====== */
+.fi-wi {
+    background: var(--surface-card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 0.75rem !important;
+}
+
+.fi-wi-stats-overview-stat {
+    padding: 1.25rem !important;
+}
+
+.fi-wi-stats-overview-stat-value {
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+}
+
+.fi-wi-stats-overview-stat-label {
+    color: var(--text-muted) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+}
+
+/* ====== BUTTONS ====== */
+.fi-btn-primary {
+    background: var(--brand-primary) !important;
+    border: none !important;
+    font-weight: 600 !important;
+}
+
+.fi-btn-primary:hover {
+    background: var(--brand-primary-dark) !important;
+}
+
+/* ====== REPEATER ====== */
+.fi-fo-repeater-item {
+    background: var(--surface-base) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.dark .fi-fo-repeater-item {
+    background: var(--surface-elevated) !important;
+}
+
+/* ====== BADGES ====== */
+.fi-badge {
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+    border-radius: 9999px !important;
+}
+
+/* ====== BREADCRUMBS ====== */
+.fi-breadcrumbs {
+    color: var(--text-muted) !important;
+}
+
+.fi-breadcrumbs a {
+    color: var(--text-secondary) !important;
+}
+
+.fi-breadcrumbs a:hover {
+    color: var(--brand-primary) !important;
+}
+
+/* ====== MODALS ====== */
+.fi-modal-window {
+    background: var(--surface-card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 0.875rem !important;
+}
+
+/* ====== LOGIN PAGE ====== */
+.fi-simple-layout {
+    background: var(--surface-base) !important;
+}
+
+.fi-simple-main {
+    background: var(--surface-card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 0.875rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ====== NOTIFICATIONS ====== */
+.fi-notification {
+    background: var(--surface-card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 0.625rem !important;
+}
+
+/* ====== DROPDOWN ====== */
+.fi-dropdown-panel {
+    background: var(--surface-card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dark .fi-dropdown-panel {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ====== SCROLLBAR ====== */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}

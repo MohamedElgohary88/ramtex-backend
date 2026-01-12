@@ -17,7 +17,9 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-cube';
+    
+    protected static ?string $navigationGroup = 'Inventory';
 
     public static function form(Form $form): Form
     {
@@ -99,9 +101,15 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('price')
                     ->money('USD')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('stock_on_hand')
+                    ->numeric()
+                    ->sortable()
+                    ->label('Stock')
+                    ->color(fn (Product $record): string => $record->stock_on_hand <= $record->min_stock_alert ? 'danger' : 'success'),
                 Tables\Columns\TextColumn::make('min_stock_alert')
                     ->numeric()
-                    ->label('Min Alert'),
+                    ->label('Min Alert')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean(),
             ])

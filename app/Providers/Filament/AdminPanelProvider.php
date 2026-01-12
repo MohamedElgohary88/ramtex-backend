@@ -10,6 +10,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -29,17 +30,36 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->colors([
                 'primary' => Color::Amber,
+                'gray' => Color::Zinc,
+                'danger' => Color::Rose,
+                'info' => Color::Sky,
+                'success' => Color::Emerald,
+                'warning' => Color::Orange,
             ])
+            ->font('DM Sans')
+            ->brandName('Ramtex ERP')
+            ->brandLogo(fn () => view('filament.brand-logo'))
+            ->darkModeBrandLogo(fn () => view('filament.brand-logo'))
+            ->darkMode(true, false) // Enable dark mode toggle, default to light
+            ->sidebarCollapsibleOnDesktop()
+            ->sidebarWidth('280px')
+            ->collapsibleNavigationGroups(true)
+            ->navigationGroups([
+                'Sales',
+                'Inventory',
+                'Finance',
+                'Settings',
+            ])
+            ->maxContentWidth(MaxWidth::Full)
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
-            ])
+            ->widgets([])
+            ->spa() // Enable SPA mode for smoother transitions
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

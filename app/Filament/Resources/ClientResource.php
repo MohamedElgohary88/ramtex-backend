@@ -24,17 +24,20 @@ class ClientResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('General Information')
-                    ->columns(2)
+                    ->description('Manage client personal and contact details')
                     ->schema([
                         Forms\Components\TextInput::make('full_name')
                             ->required()
                             ->maxLength(255)
-                            ->label('Full Name'),
+                            ->label('Full Name')
+                            ->columnSpan(1),
                         Forms\Components\TextInput::make('company_name')
                             ->maxLength(255)
-                            ->label('Company Name'),
+                            ->label('Company Name')
+                            ->columnSpan(1),
                         Forms\Components\TextInput::make('job_title')
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->columnSpan(1),
                         Forms\Components\Select::make('gender')
                             ->options([
                                 'M.' => 'M.',
@@ -42,52 +45,66 @@ class ClientResource extends Resource
                                 'Mrs.' => 'Mrs.',
                                 'Miss.' => 'Miss.',
                             ])
-                            ->searchable(),
-                    ]),
-
-                Forms\Components\Section::make('Contact Details')
-                    ->columns(2)
-                    ->schema([
+                            ->searchable()
+                            ->columnSpan(1),
                         Forms\Components\TextInput::make('email')
                             ->email()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->columnSpan(1),
                         Forms\Components\TextInput::make('phone')
                             ->tel()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->columnSpan(1),
                         Forms\Components\TextInput::make('other_phone')
                             ->tel()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->label('Alternative Phone')
+                            ->columnSpan(1),
                         Forms\Components\TextInput::make('fax')
-                            ->maxLength(255),
-                    ]),
+                            ->maxLength(255)
+                            ->columnSpan(1),
+                    ])
+                    ->columns(2)
+                    ->columnSpanFull(),
 
                 Forms\Components\Section::make('Address & Location')
-                    ->columns(2)
+                    ->description('Client address and geographic details')
                     ->schema([
                         Forms\Components\Textarea::make('address')
                             ->maxLength(65535)
+                            ->rows(3)
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('city')
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->columnSpan(1),
                         Forms\Components\TextInput::make('district')
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->columnSpan(1),
                         Forms\Components\TextInput::make('pobox')
                             ->maxLength(255)
-                            ->label('PO Box'),
+                            ->label('PO Box')
+                            ->columnSpan(1),
                         Forms\Components\TextInput::make('country')
                             ->maxLength(255)
-                            ->default('Lebanon'),
-                    ]),
+                            ->default('Lebanon')
+                            ->columnSpan(1),
+                    ])
+                    ->columns(2)
+                    ->columnSpanFull(),
 
                 Forms\Components\Section::make('Financial Information')
-                    ->columns(2)
+                    ->description('Tax and banking details')
                     ->schema([
                         Forms\Components\TextInput::make('financial_number')
                             ->maxLength(255)
-                            ->label('MOF / Tax ID'),
+                            ->label('MOF / Tax ID')
+                            ->columnSpan(1),
                         Forms\Components\TextInput::make('bank_details')
-                            ->maxLength(255),
-                    ]),
+                            ->maxLength(255)
+                            ->columnSpan(1),
+                    ])
+                    ->columns(2)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -152,7 +169,7 @@ class ClientResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\FinancialTransactionsRelationManager::class,
         ];
     }
 
