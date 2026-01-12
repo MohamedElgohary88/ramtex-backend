@@ -23,21 +23,24 @@ class ClientResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('General Information')
-                    ->description('Manage client personal and contact details')
+                // الكارد الرئيسي واخد الشاشة كلها
+                Forms\Components\Section::make('Client Details')
+                    ->description('Manage client personal and contact information')
                     ->schema([
-                        Forms\Components\TextInput::make('full_name')
-                            ->required()
-                            ->maxLength(255)
-                            ->label('Full Name')
-                            ->columnSpan(1),
+                        // الصف الأول
                         Forms\Components\TextInput::make('company_name')
-                            ->maxLength(255)
                             ->label('Company Name')
-                            ->columnSpan(1),
+                            ->placeholder('Startups Inc.')
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('full_name')
+                            ->label('Full Name')
+                            ->required()
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('job_title')
-                            ->maxLength(255)
-                            ->columnSpan(1),
+                            ->label('Job Title')
+                            ->maxLength(255),
+                        
+                        // الصف التاني
                         Forms\Components\Select::make('gender')
                             ->options([
                                 'M.' => 'M.',
@@ -45,65 +48,56 @@ class ClientResource extends Resource
                                 'Mrs.' => 'Mrs.',
                                 'Miss.' => 'Miss.',
                             ])
-                            ->searchable()
-                            ->columnSpan(1),
+                            ->searchable(),
                         Forms\Components\TextInput::make('email')
+                            ->label('Email')
                             ->email()
-                            ->maxLength(255)
-                            ->columnSpan(1),
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('phone')
+                            ->label('Phone')
                             ->tel()
-                            ->maxLength(255)
-                            ->columnSpan(1),
+                            ->maxLength(255),
+                        
+                        // الصف التالت
                         Forms\Components\TextInput::make('other_phone')
-                            ->tel()
-                            ->maxLength(255)
                             ->label('Alternative Phone')
-                            ->columnSpan(1),
+                            ->tel()
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('fax')
-                            ->maxLength(255)
-                            ->columnSpan(1),
-                    ])
-                    ->columns(2)
-                    ->columnSpanFull(),
-
-                Forms\Components\Section::make('Address & Location')
-                    ->description('Client address and geographic details')
-                    ->schema([
+                            ->label('Fax')
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('city')
+                            ->label('City')
+                            ->maxLength(255),
+                        
+                        // Address - عامود كامل
                         Forms\Components\Textarea::make('address')
+                            ->label('Address')
                             ->maxLength(65535)
                             ->rows(3)
                             ->columnSpanFull(),
-                        Forms\Components\TextInput::make('city')
-                            ->maxLength(255)
-                            ->columnSpan(1),
+                        
+                        // الصف الرابع
                         Forms\Components\TextInput::make('district')
-                            ->maxLength(255)
-                            ->columnSpan(1),
+                            ->label('District')
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('pobox')
-                            ->maxLength(255)
                             ->label('PO Box')
-                            ->columnSpan(1),
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('country')
+                            ->label('Country')
                             ->maxLength(255)
-                            ->default('Lebanon')
-                            ->columnSpan(1),
-                    ])
-                    ->columns(2)
-                    ->columnSpanFull(),
-
-                Forms\Components\Section::make('Financial Information')
-                    ->description('Tax and banking details')
-                    ->schema([
+                            ->default('Lebanon'),
+                        
+                        // الصف الخامس - Financial
                         Forms\Components\TextInput::make('financial_number')
-                            ->maxLength(255)
                             ->label('MOF / Tax ID')
-                            ->columnSpan(1),
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('bank_details')
-                            ->maxLength(255)
-                            ->columnSpan(1),
+                            ->label('Bank Details')
+                            ->maxLength(255),
                     ])
-                    ->columns(2)
+                    ->columns(3)
                     ->columnSpanFull(),
             ]);
     }
