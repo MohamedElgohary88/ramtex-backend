@@ -164,11 +164,14 @@ class ProductResource extends Resource
                                             ->label('Current Stock')
                                             ->numeric()
                                             ->default(0)
-                                            ->helperText('Current quantity in stock (updated automatically by system)')
+                                            ->helperText('Current quantity in stock (managed by Stock Movements system)')
                                             ->disabled()
                                             ->dehydrated(false)
                                             ->suffixIcon('heroicon-o-cube')
-                                            ->columnSpan(['md' => 1]),
+                                            ->columnSpan(['md' => 1])
+                                            ->extraAttributes([
+                                                'title' => 'Stock is automatically updated by stock movements, invoices, and receipts',
+                                            ]),
                                         
                                         Forms\Components\TextInput::make('min_stock_alert')
                                             ->label('Low Stock Alert Level')
