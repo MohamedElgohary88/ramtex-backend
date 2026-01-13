@@ -8,15 +8,15 @@ use Illuminate\Support\Facades\DB;
 
 class MonthlyComparisonChart extends ChartWidget
 {
-    protected static ?string $heading = 'Monthly Comparison';
+    protected static ?string $heading = 'Year-over-Year Comparison';
 
-    protected static ?string $description = 'Revenue vs. last year';
+    protected static ?string $description = 'Monthly revenue comparison with previous year';
 
     protected static ?int $sort = 6;
 
-    protected int | string | array $columnSpan = 1;
+    protected int | string | array $columnSpan = 2;
 
-    protected static ?string $maxHeight = '280px';
+    protected static ?string $maxHeight = '300px';
 
     protected function getData(): array
     {
@@ -39,20 +39,30 @@ class MonthlyComparisonChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => (string) $currentYear,
-                    'data' => array_map(fn ($m) => $currentYearData[$m] ?? 0, range(1, 12)),
-                    'borderColor' => '#f59e0b',
+                    'label' => "{$currentYear} Revenue",
+                    'data' => array_map(fn ($m) => round($currentYearData[$m] ?? 0, 2), range(1, 12)),
+                    'borderColor' => 'rgb(245, 158, 11)',
                     'backgroundColor' => 'rgba(245, 158, 11, 0.1)',
                     'fill' => true,
                     'tension' => 0.4,
+                    'pointRadius' => 3,
+                    'pointHoverRadius' => 5,
+                    'pointBackgroundColor' => 'rgb(245, 158, 11)',
+                    'pointBorderColor' => '#ffffff',
+                    'pointBorderWidth' => 2,
                 ],
                 [
-                    'label' => (string) $lastYear,
-                    'data' => array_map(fn ($m) => $lastYearData[$m] ?? 0, range(1, 12)),
-                    'borderColor' => '#6b7280',
+                    'label' => "{$lastYear} Revenue",
+                    'data' => array_map(fn ($m) => round($lastYearData[$m] ?? 0, 2), range(1, 12)),
+                    'borderColor' => 'rgb(107, 114, 128)',
                     'backgroundColor' => 'transparent',
                     'borderDash' => [5, 5],
                     'tension' => 0.4,
+                    'pointRadius' => 3,
+                    'pointHoverRadius' => 5,
+                    'pointBackgroundColor' => 'rgb(107, 114, 128)',
+                    'pointBorderColor' => '#ffffff',
+                    'pointBorderWidth' => 2,
                 ],
             ],
             'labels' => $months,
@@ -67,31 +77,70 @@ class MonthlyComparisonChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'responsive' => true,
+            'maintainAspectRatio' => true,
             'plugins' => [
                 'legend' => [
                     'display' => true,
                     'position' => 'bottom',
                     'labels' => [
-                        'color' => 'rgba(255, 255, 255, 0.7)',
+                        'color' => 'rgba(156, 163, 175, 0.9)',
                         'usePointStyle' => true,
+                        'pointStyle' => 'circle',
+                        'padding' => 16,
+                        'font' => [
+                            'size' => 12,
+                            'weight' => '500',
+                        ],
+                    ],
+                ],
+                'tooltip' => [
+                    'enabled' => true,
+                    'mode' => 'index',
+                    'intersect' => false,
+                    'backgroundColor' => 'rgba(0, 0, 0, 0.8)',
+                    'titleColor' => '#ffffff',
+                    'bodyColor' => '#ffffff',
+                    'borderColor' => 'rgba(156, 163, 175, 0.3)',
+                    'borderWidth' => 1,
+                    'padding' => 12,
+                    'callbacks' => [
+                        'label' => 'function(context) { return context.dataset.label + ": $" + context.parsed.y.toFixed(2); }',
                     ],
                 ],
             ],
             'scales' => [
                 'y' => [
+                    'beginAtZero' => true,
                     'grid' => [
-                        'color' => 'rgba(255, 255, 255, 0.05)',
+                        'display' => true,
+                        'color' => 'rgba(156, 163, 175, 0.1)',
+                        'drawBorder' => false,
                     ],
                     'ticks' => [
-                        'color' => 'rgba(255, 255, 255, 0.5)',
+                        'color' => 'rgba(156, 163, 175, 0.7)',
+                        'font' => [
+                            'size' => 11,
+                        ],
+                        'callback' => 'function(value) { return "$" + value; }',
+                    ],
+                    'border' => [
+                        'display' => false,
                     ],
                 ],
                 'x' => [
                     'grid' => [
                         'display' => false,
+                        'drawBorder' => false,
                     ],
                     'ticks' => [
-                        'color' => 'rgba(255, 255, 255, 0.5)',
+                        'color' => 'rgba(156, 163, 175, 0.7)',
+                        'font' => [
+                            'size' => 11,
+                        ],
+                    ],
+                    'border' => [
+                        'display' => false,
                     ],
                 ],
             ],

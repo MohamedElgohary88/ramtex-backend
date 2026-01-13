@@ -23,21 +23,85 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255)
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
-                
-                Forms\Components\TextInput::make('slug')
-                    ->required()
-                    ->maxLength(255)
-                    ->unique(ignoreRecord: true),
-                
-                Forms\Components\Toggle::make('is_active')
-                    ->required()
-                    ->default(true),
-            ]);
+                // Basic Details Section
+                Forms\Components\Section::make('Category Details')
+                    ->description('Category name, slug, and basic information')
+                    ->icon('heroicon-o-tag')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Category Name')
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder('Electronics, Clothing, Food, etc.')
+                            ->helperText('The display name for this category')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => 
+                                $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null
+                            )
+                            ->columnSpan(['md' => 1]),
+                        
+                        Forms\Components\Grid::make(3)
+                            ->schema([
+                                Forms\Components\TextInput::make('slug')
+                                    ->label('URL Slug')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->unique(ignoreRecord: true)
+                                    ->placeholder('electronics-accessories')
+                                    ->helperText('URL-friendly identifier (auto-generated from name)')
+                                    ->disabled(fn ($operation) => $operation === 'create')
+                                    ->dehydrated()
+                                    ->suffixIcon('heroicon-o-link')
+                                    ->columnSpan(2),
+                                
+                                Forms\Components\Toggle::make('is_active')
+                                    ->label('Status')
+                                    ->helperText('Active categories appear in listings')
+                                    ->inline(false)
+                                    ->required()
+                                    ->default(true)
+                                    ->columnSpan(1),
+                            ])
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(['md' => 1])
+                    ->columnSpanFull(),
+
+                // Additional Information Section
+                Forms\Components\Section::make('Additional Information')
+                    ->description('Optional description and media')
+                    ->icon('heroicon-o-document-text')
+                    ->schema([
+                        Forms\Components\Textarea::make('description')
+                            ->label('Description')
+                            ->placeholder('Brief description of what products belong to this category...')
+                            ->helperText('Optional: Describe what items are included in this category')
+                            ->rows(3)
+                            ->maxLength(65535)
+                            ->columnSpanFull(),
+                        
+                        Forms\Components\FileUpload::make('image_path')
+                            ->label('Category Image')
+                            ->image()
+                            ->directory('categories')
+                            ->visibility('public')
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ])
+                            ->helperText('Optional: Upload a representative image for this category')
+                            ->maxSize(2048)
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(1)
+                    ->collapsible()
+                    ->collapsed()
+                    ->columnSpanFull(),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table

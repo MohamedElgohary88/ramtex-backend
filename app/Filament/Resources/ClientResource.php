@@ -23,83 +23,164 @@ class ClientResource extends Resource
     {
         return $form
             ->schema([
-                // الكارد الرئيسي واخد الشاشة كلها
-                Forms\Components\Section::make('Client Details')
-                    ->description('Manage client personal and contact information')
+                // Basic Information Section
+                Forms\Components\Section::make('Basic Information')
+                    ->description('Client name, company, and role details')
+                    ->icon('heroicon-o-user')
                     ->schema([
-                        // الصف الأول
-                        Forms\Components\TextInput::make('company_name')
-                            ->label('Company Name')
-                            ->placeholder('Startups Inc.')
-                            ->maxLength(255),
                         Forms\Components\TextInput::make('full_name')
                             ->label('Full Name')
                             ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('job_title')
-                            ->label('Job Title')
-                            ->maxLength(255),
+                            ->placeholder('John Smith')
+                            ->helperText('The primary contact person\'s full name')
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->columnSpan(['md' => 1]),
                         
-                        // الصف التاني
                         Forms\Components\Select::make('gender')
+                            ->label('Title / Gender')
                             ->options([
-                                'M.' => 'M.',
                                 'Mr.' => 'Mr.',
                                 'Mrs.' => 'Mrs.',
-                                'Miss.' => 'Miss.',
+                                'Miss.' => 'Miss',
+                                'M.' => 'M.',
                             ])
-                            ->searchable(),
-                        Forms\Components\TextInput::make('email')
-                            ->label('Email')
-                            ->email()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('phone')
-                            ->label('Phone')
-                            ->tel()
-                            ->maxLength(255),
+                            ->searchable()
+                            ->placeholder('Select title')
+                            ->helperText('Professional title or gender prefix')
+                            ->columnSpan(['md' => 1]),
                         
-                        // الصف التالت
+                        Forms\Components\TextInput::make('company_name')
+                            ->label('Company Name')
+                            ->placeholder('Startups Inc.')
+                            ->helperText('Optional: Client company or organization name')
+                            ->maxLength(255)
+                            ->columnSpan(['md' => 1]),
+                        
+                        Forms\Components\TextInput::make('job_title')
+                            ->label('Job Title')
+                            ->placeholder('CEO, Manager, etc.')
+                            ->helperText('Optional: Position or role in company')
+                            ->maxLength(255)
+                            ->columnSpan(['md' => 1]),
+                    ])
+                    ->columns(['md' => 2])
+                    ->collapsible()
+                    ->columnSpanFull(),
+
+                // Contact Information Section
+                Forms\Components\Section::make('Contact Information')
+                    ->description('Email, phone numbers, and communication channels')
+                    ->icon('heroicon-o-phone')
+                    ->schema([
+                        Forms\Components\TextInput::make('email')
+                            ->label('Email Address')
+                            ->email()
+                            ->placeholder('client@example.com')
+                            ->helperText('Primary email for invoices and communication')
+                            ->maxLength(255)
+                            ->suffixIcon('heroicon-o-envelope')
+                            ->columnSpan(['md' => 1]),
+                        
+                        Forms\Components\TextInput::make('phone')
+                            ->label('Phone Number')
+                            ->tel()
+                            ->placeholder('+961 1 234567')
+                            ->helperText('Primary contact phone number')
+                            ->required()
+                            ->maxLength(255)
+                            ->suffixIcon('heroicon-o-phone')
+                            ->columnSpan(['md' => 1]),
+                        
                         Forms\Components\TextInput::make('other_phone')
                             ->label('Alternative Phone')
                             ->tel()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('fax')
-                            ->label('Fax')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('city')
-                            ->label('City')
-                            ->maxLength(255),
+                            ->placeholder('+961 3 987654')
+                            ->helperText('Optional: Secondary contact number')
+                            ->maxLength(255)
+                            ->suffixIcon('heroicon-o-phone')
+                            ->columnSpan(['md' => 1]),
                         
-                        // Address - عامود كامل
+                        Forms\Components\TextInput::make('fax')
+                            ->label('Fax Number')
+                            ->placeholder('+961 1 234568')
+                            ->helperText('Optional: Fax number if applicable')
+                            ->maxLength(255)
+                            ->columnSpan(['md' => 1]),
+                    ])
+                    ->columns(['md' => 2])
+                    ->collapsible()
+                    ->columnSpanFull(),
+
+                // Address & Location Section
+                Forms\Components\Section::make('Address & Location')
+                    ->description('Physical address and location details')
+                    ->icon('heroicon-o-map-pin')
+                    ->schema([
                         Forms\Components\Textarea::make('address')
-                            ->label('Address')
+                            ->label('Street Address')
+                            ->placeholder('Building name, street, area...')
+                            ->helperText('Full street address including building/floor details')
                             ->maxLength(65535)
                             ->rows(3)
                             ->columnSpanFull(),
                         
-                        // الصف الرابع
+                        Forms\Components\TextInput::make('city')
+                            ->label('City')
+                            ->placeholder('Beirut')
+                            ->maxLength(255)
+                            ->columnSpan(['md' => 1]),
+                        
                         Forms\Components\TextInput::make('district')
-                            ->label('District')
-                            ->maxLength(255),
+                            ->label('District / Area')
+                            ->placeholder('Hamra, Achrafieh, etc.')
+                            ->helperText('Neighborhood or district name')
+                            ->maxLength(255)
+                            ->columnSpan(['md' => 1]),
+                        
                         Forms\Components\TextInput::make('pobox')
                             ->label('PO Box')
-                            ->maxLength(255),
+                            ->placeholder('P.O. Box 1234')
+                            ->helperText('Optional: Postal box number')
+                            ->maxLength(255)
+                            ->columnSpan(['md' => 1]),
+                        
                         Forms\Components\TextInput::make('country')
                             ->label('Country')
+                            ->default('Lebanon')
+                            ->placeholder('Lebanon')
+                            ->required()
                             ->maxLength(255)
-                            ->default('Lebanon'),
-                        
-                        // الصف الخامس - Financial
-                        Forms\Components\TextInput::make('financial_number')
-                            ->label('MOF / Tax ID')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('bank_details')
-                            ->label('Bank Details')
-                            ->maxLength(255),
+                            ->columnSpan(['md' => 1]),
                     ])
-                    ->columns(3)
+                    ->columns(['md' => 2])
+                    ->collapsible()
                     ->columnSpanFull(),
-            ]);
+
+                // Financial Information Section
+                Forms\Components\Section::make('Financial & Legal Information')
+                    ->description('Tax ID, bank details, and financial records')
+                    ->icon('heroicon-o-banknotes')
+                    ->schema([
+                        Forms\Components\TextInput::make('financial_number')
+                            ->label('Tax ID / MOF Number')
+                            ->placeholder('Enter tax registration number')
+                            ->helperText('Ministry of Finance tax registration or VAT number')
+                            ->maxLength(255)
+                            ->columnSpan(['md' => 1]),
+                        
+                        Forms\Components\TextInput::make('bank_details')
+                            ->label('Bank Account Details')
+                            ->placeholder('Bank name, IBAN, SWIFT, etc.')
+                            ->helperText('Optional: Bank information for payments and receipts')
+                            ->maxLength(255)
+                            ->columnSpan(['md' => 1]),
+                    ])
+                    ->columns(['md' => 2])
+                    ->collapsible()
+                    ->columnSpanFull(),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table

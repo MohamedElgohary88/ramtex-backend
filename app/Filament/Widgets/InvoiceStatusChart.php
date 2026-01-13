@@ -7,13 +7,15 @@ use Filament\Widgets\ChartWidget;
 
 class InvoiceStatusChart extends ChartWidget
 {
-    protected static ?string $heading = 'Invoice Status';
+    protected static ?string $heading = 'Invoice Status Distribution';
+    
+    protected static ?string $description = 'Breakdown of invoices by status';
 
     protected static ?int $sort = 7;
 
     protected int | string | array $columnSpan = 1;
 
-    protected static ?string $maxHeight = '280px';
+    protected static ?string $maxHeight = '300px';
 
     protected function getData(): array
     {
@@ -23,24 +25,30 @@ class InvoiceStatusChart extends ChartWidget
             ->pluck('count', 'status')
             ->toArray();
 
+        $posted = $statuses['posted'] ?? 0;
+        $draft = $statuses['draft'] ?? 0;
+        $cancelled = $statuses['cancelled'] ?? 0;
+        $total = $posted + $draft + $cancelled;
+
         return [
             'datasets' => [
                 [
-                    'data' => [
-                        $statuses['posted'] ?? 0,
-                        $statuses['draft'] ?? 0,
-                        $statuses['cancelled'] ?? 0,
-                    ],
+                    'data' => [$posted, $draft, $cancelled],
                     'backgroundColor' => [
-                        '#10b981', // emerald
-                        '#f59e0b', // amber
-                        '#ef4444', // red
+                        'rgb(34, 197, 94)',   // Green for Posted
+                        'rgb(245, 158, 11)',  // Amber for Draft
+                        'rgb(239, 68, 68)',   // Red for Cancelled
                     ],
                     'borderColor' => '#ffffff',
                     'borderWidth' => 3,
+                    'hoverOffset' => 8,
                 ],
             ],
-            'labels' => ['Posted', 'Draft', 'Cancelled'],
+            'labels' => [
+                "Posted ({$posted})", 
+                "Draft ({$draft})", 
+                "Cancelled ({$cancelled})"
+            ],
         ];
     }
 
@@ -52,18 +60,44 @@ class InvoiceStatusChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'responsive' => true,
+            'maintainAspectRatio' => true,
             'plugins' => [
                 'legend' => [
                     'display' => true,
                     'position' => 'bottom',
                     'labels' => [
-                        'color' => 'rgba(255, 255, 255, 0.7)',
+                        'color' => 'rgba(156, 163, 175, 0.9)',
                         'usePointStyle' => true,
-                        'padding' => 20,
+                        'pointStyle' => 'circle',
+                        'padding' => 16,
+                        'font' => [
+                            'size' => 12,
+                            'weight' => '500',
+                        ],
+                    ],
+                ],
+                'tooltip' => [
+                    'enabled' => true,
+                    'backgroundColor' => 'rgba(0, 0, 0, 0.8)',
+                    'titleColor' => '#ffffff',
+                    'bodyColor' => '#ffffff',
+                    'borderColor' => 'rgba(156, 163, 175, 0.3)',
+                    'borderWidth' => 1,
+                    'padding' => 12,
+                    'displayColors' => true,
+                    'callbacks' => [
+                        'label' => 'function(context) { 
+                            var label = context.label || "";
+                            var value = context.parsed || 0;
+                            var total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            var percentage = ((value / total) * 100).toFixed(1);
+                            return label + ": " + percentage + "%";
+                        }',
                     ],
                 ],
             ],
-            'cutout' => '70%',
+            'cutout' => '65%',
         ];
     }
 }
