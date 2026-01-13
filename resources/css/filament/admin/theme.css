@@ -299,6 +299,44 @@ input[type="checkbox"]:focus {
     margin-right: 0 !important;
 }
 
+/* Create/Edit Page Grid - Full Width Single Column */
+.fi-page-create,
+.fi-page-edit {
+    /* Remove any grid constraints */
+    display: block !important;
+}
+
+.fi-page-create .fi-main-ctn,
+.fi-page-edit .fi-main-ctn {
+    display: block !important;
+    max-width: 100% !important;
+}
+
+/* Remove centered column constraints from Filament v3 */
+.fi-page-create .fi-main-ctn > div,
+.fi-page-edit .fi-main-ctn > div {
+    grid-column: 1 / -1 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Force simple page layout to be full width */
+.fi-simple-page .fi-simple-ctn {
+    max-width: 100% !important;
+    grid-column: 1 / -1 !important;
+}
+
+/* Override Filament's default narrow column span */
+.fi-page-create [class*="col-start"],
+.fi-page-edit [class*="col-start"] {
+    grid-column-start: 1 !important;
+}
+
+.fi-page-create [class*="col-span"],
+.fi-page-edit [class*="col-span"] {
+    grid-column: 1 / -1 !important;
+}
+
 /* ====== CARDS & SECTIONS ====== */
 .fi-section {
     background: var(--surface-card) !important;
@@ -632,7 +670,7 @@ input[type="checkbox"]:focus {
     border: 1px solid rgba(37, 99, 235, 0.2) !important;
 }
 
-/* Action Buttons */
+/* Action Buttons - Inline (Non-Sticky) */
 .fi-form-actions {
     display: flex !important;
     justify-content: flex-end !important;
@@ -642,15 +680,18 @@ input[type="checkbox"]:focus {
     background: var(--surface-card) !important;
     margin-top: var(--spacing-xl) !important;
     border-radius: var(--radius-lg) !important;
+    position: static !important;
 }
 
-/* Sticky Action Bar for Long Forms */
+/* Create/Edit Page Actions - Inline at End of Form */
 .fi-page-edit .fi-form-actions,
 .fi-page-create .fi-form-actions {
-    position: sticky !important;
-    bottom: 0 !important;
-    z-index: 10 !important;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1) !important;
+    position: static !important;
+    bottom: auto !important;
+    z-index: auto !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
 /* Page Header Enhancement */
