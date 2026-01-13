@@ -35,27 +35,53 @@ class SalesReturnResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Return Details')
+                    ->description('Client, return number, date, and status')
+                    ->icon('heroicon-o-arrow-path')
                     ->schema([
                         Forms\Components\TextInput::make('return_number')
+                            ->label('Return Number')
                             ->disabled()
                             ->dehydrated(false)
-                            ->placeholder('Auto-generated'),
+                            ->placeholder('Auto-generated')
+                            ->helperText('Return number is automatically generated upon creation')
+                            ->suffixIcon('heroicon-o-hashtag')
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\Select::make('client_id')
-                            ->relationship('client', 'full_name') // Accessor or column
+                            ->label('Client')
+                            ->relationship('client', 'full_name')
                             ->searchable()
                             ->preload()
-                            ->required(),
+                            ->required()
+                            ->helperText('Select client returning products')
+                            ->suffixIcon('heroicon-o-user')
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\DatePicker::make('return_date')
+                            ->label('Return Date')
                             ->default(now())
-                            ->required(),
+                            ->required()
+                            ->helperText('Date when products were returned')
+                            ->suffixIcon('heroicon-o-calendar')
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\Select::make('status')
+                            ->label('Status')
                             ->options(InvoiceStatus::class)
                             ->default(InvoiceStatus::DRAFT)
                             ->disabled()
-                            ->dehydrated(false),
-                    ])->columns(4),
+                            ->dehydrated(false)
+                            ->helperText('Status is managed by system')
+                            ->suffixIcon('heroicon-o-flag')
+                            ->columnSpan(['md' => 1]),
+                    ])
+                    ->columns(['md' => 4])
+                    ->collapsible()
+                    ->columnSpanFull(),
 
                 Forms\Components\Section::make('Return Items')
+                    ->description('Products being returned with quantities and prices')
+                    ->icon('heroicon-o-shopping-cart')
                     ->schema([
                         Forms\Components\Repeater::make('items')
                             ->relationship()
@@ -74,6 +100,7 @@ class SalesReturnResource extends Resource
                                     })
                                     ->columnSpan(4),
                                 Forms\Components\TextInput::make('quantity')
+                                    ->label('Qty Returned')
                                     ->numeric()
                                     ->required()
                                     ->default(1)
@@ -82,6 +109,7 @@ class SalesReturnResource extends Resource
                                     ->afterStateUpdated(fn (Set $set, Get $get) => self::updateLineTotal($set, $get))
                                     ->columnSpan(2),
                                 Forms\Components\TextInput::make('unit_price')
+                                    ->label('Unit Price')
                                     ->numeric()
                                     ->required()
                                     ->prefix('$')
@@ -89,6 +117,7 @@ class SalesReturnResource extends Resource
                                     ->afterStateUpdated(fn (Set $set, Get $get) => self::updateLineTotal($set, $get))
                                     ->columnSpan(3),
                                 Forms\Components\TextInput::make('total_price')
+                                    ->label('Line Total')
                                     ->numeric()
                                     ->prefix('$')
                                     ->disabled()
@@ -97,16 +126,33 @@ class SalesReturnResource extends Resource
                             ])
                             ->columns(12)
                             ->defaultItems(1)
-                            ->minItems(1),
-                    ]),
+                            ->minItems(1)
+                            ->addActionLabel('Add Item')
+                            ->reorderable(false)
+                            ->collapsible()
+                            ->cloneable()
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible()
+                    ->columnSpanFull(),
 
-                Forms\Components\Section::make('Notes')
+                Forms\Components\Section::make('Additional Notes')
+                    ->description('Reason for return or additional information')
+                    ->icon('heroicon-o-document-text')
                     ->schema([
                         Forms\Components\Textarea::make('notes')
+                            ->label('Notes')
+                            ->placeholder('Reason for return, product condition, or other relevant details...')
+                            ->helperText('Optional: Add notes explaining the return')
                             ->rows(3)
+                            ->maxLength(65535)
                             ->columnSpanFull(),
-                    ]),
-            ]);
+                    ])
+                    ->collapsible()
+                    ->collapsed()
+                    ->columnSpanFull(),
+            ])
+            ->columns(1);
     }
 
     public static function updateLineTotal(Set $set, Get $get): void
