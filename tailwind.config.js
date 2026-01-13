@@ -1,6 +1,5 @@
 import preset from './vendor/filament/filament/tailwind.config.preset'
 
-/** @type {import('tailwindcss').Config} */
 export default {
     presets: [preset],
     content: [
@@ -8,7 +7,4 @@ export default {
         './resources/views/filament/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
     ],
-    theme: {
-        extend: {},
-    },
 }
