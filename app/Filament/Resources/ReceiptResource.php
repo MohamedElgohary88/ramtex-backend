@@ -31,72 +31,125 @@ class ReceiptResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Receipt Details')
+                    ->description('Receipt number, client, and date received')
+                    ->icon('heroicon-o-banknotes')
                     ->schema([
                         Forms\Components\TextInput::make('receipt_number')
                             ->label('Receipt #')
                             ->disabled()
                             ->dehydrated(false)
-                            ->placeholder('Auto-generated'),
+                            ->placeholder('Auto-generated')
+                            ->helperText('Receipt number is automatically generated upon creation')
+                            ->suffixIcon('heroicon-o-hashtag')
+                            ->columnSpan(['md' => 1]),
 
                         Forms\Components\Select::make('client_id')
                             ->relationship('client', 'full_name')
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->columnSpan(2),
+                            ->helperText('Client who made the payment')
+                            ->suffixIcon('heroicon-o-user')
+                            ->columnSpan(['md' => 2]),
 
                         Forms\Components\DateTimePicker::make('received_at')
-                            ->label('Received Date')
+                            ->label('Received Date & Time')
                             ->default(now())
-                            ->required(),
-                    ])->columns(4),
+                            ->required()
+                            ->helperText('Date and time when payment was received')
+                            ->suffixIcon('heroicon-o-calendar')
+                            ->columnSpan(['md' => 1]),
+                    ])
+                    ->columns(['md' => 4])
+                    ->collapsible()
+                    ->columnSpanFull(),
 
                 Forms\Components\Section::make('Payment Information')
+                    ->description('Amount received and payment method')
+                    ->icon('heroicon-o-currency-dollar')
                     ->schema([
                         Forms\Components\TextInput::make('amount')
+                            ->label('Amount Received')
                             ->required()
                             ->numeric()
                             ->prefix('$')
                             ->minValue(0.01)
-                            ->step(0.01),
+                            ->step(0.01)
+                            ->helperText('Total amount received from client')
+                            ->suffixIcon('heroicon-o-currency-dollar')
+                            ->columnSpan(['md' => 1]),
 
                         Forms\Components\Select::make('payment_method')
+                            ->label('Payment Method')
                             ->options(PaymentMethod::options())
                             ->required()
                             ->live()
-                            ->default(PaymentMethod::CASH->value),
-                    ])->columns(2),
+                            ->default(PaymentMethod::CASH->value)
+                            ->helperText('How the payment was received')
+                            ->suffixIcon('heroicon-o-wallet')
+                            ->columnSpan(['md' => 1]),
+                    ])
+                    ->columns(['md' => 2])
+                    ->collapsible()
+                    ->columnSpanFull(),
 
                 Forms\Components\Section::make('Check Details')
+                    ->description('Check-specific information')
+                    ->icon('heroicon-o-document-check')
                     ->schema([
                         Forms\Components\TextInput::make('check_number')
                             ->label('Check Number')
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->helperText('Check serial number')
+                            ->suffixIcon('heroicon-o-hashtag')
+                            ->columnSpan(['md' => 1]),
 
                         Forms\Components\TextInput::make('check_bank')
                             ->label('Bank Name')
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->helperText('Bank that issued the check')
+                            ->suffixIcon('heroicon-o-building-library')
+                            ->columnSpan(['md' => 1]),
 
                         Forms\Components\DatePicker::make('check_date')
-                            ->label('Check Date'),
+                            ->label('Check Date')
+                            ->helperText('Date written on the check')
+                            ->suffixIcon('heroicon-o-calendar')
+                            ->columnSpan(['md' => 1]),
                     ])
-                    ->columns(3)
+                    ->columns(['md' => 3])
+                    ->collapsible()
+                    ->columnSpanFull()
                     ->visible(fn (Get $get): bool => $get('payment_method') === PaymentMethod::CHECK->value),
 
-                Forms\Components\Section::make('Additional Info')
+                Forms\Components\Section::make('Additional Information')
+                    ->description('User who received payment and optional notes')
+                    ->icon('heroicon-o-information-circle')
                     ->schema([
                         Forms\Components\Select::make('user_id')
                             ->relationship('user', 'name')
                             ->label('Received By')
                             ->searchable()
                             ->preload()
-                            ->default(auth()->id()),
+                            ->default(auth()->id())
+                            ->helperText('Admin user who recorded this receipt')
+                            ->suffixIcon('heroicon-o-user')
+                            ->columnSpan(['md' => 1]),
 
                         Forms\Components\Textarea::make('notes')
-                            ->rows(2)
+                            ->label('Notes')
+                            ->placeholder('Any additional notes or comments about this receipt...')
+                            ->helperText('Optional: Add internal notes for reference')
+                            ->rows(3)
+                            ->maxLength(65535)
                             ->columnSpanFull(),
-                    ]),
-            ]);
+                    ])
+                    ->columns(['md' => 1])
+                    ->collapsible()
+                    ->collapsed()
+                    ->columnSpanFull(),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table

@@ -25,27 +25,62 @@ class StockMovementResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('product_id')
-                    ->relationship('product', 'name')
-                    ->required()
-                    ->searchable()
-                    ->preload(),
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'in' => 'Stock In (+)',
-                        'out' => 'Stock Out (-)',
-                        'adjustment' => 'Adjustment (+)',
+                Forms\Components\Section::make('Stock Movement Details')
+                    ->description('Product, movement type, and quantity information')
+                    ->icon('heroicon-o-clipboard-document-list')
+                    ->schema([
+                        Forms\Components\Select::make('product_id')
+                            ->label('Product')
+                            ->relationship('product', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload()
+                            ->helperText('Select the product for this stock movement')
+                            ->suffixIcon('heroicon-o-cube')
+                            ->columnSpan(['md' => 2]),
+
+                        Forms\Components\Select::make('type')
+                            ->label('Movement Type')
+                            ->options([
+                                'in' => 'Stock In (+)',
+                                'out' => 'Stock Out (-)',
+                                'adjustment' => 'Adjustment (+)',
+                            ])
+                            ->required()
+                            ->helperText('Stock In: Adds to inventory, Stock Out: Removes from inventory, Adjustment: Inventory correction')
+                            ->suffixIcon('heroicon-o-arrow-path')
+                            ->columnSpan(['md' => 1]),
+
+                        Forms\Components\TextInput::make('quantity')
+                            ->label('Quantity')
+                            ->required()
+                            ->numeric()
+                            ->minValue(1)
+                            ->helperText('Number of units to add or remove')
+                            ->suffixIcon('heroicon-o-hashtag')
+                            ->columnSpan(['md' => 1]),
                     ])
-                    ->required(),
-                Forms\Components\TextInput::make('quantity')
-                    ->required()
-                    ->numeric()
-                    ->minValue(1)
-                    ->label('Quantity'),
-                Forms\Components\Textarea::make('notes')
-                    ->columnSpanFull()
-                    ->maxLength(255),
-            ]);
+                    ->columns(['md' => 4])
+                    ->collapsible()
+                    ->columnSpanFull(),
+
+                Forms\Components\Section::make('Additional Notes')
+                    ->description('Optional notes about this stock movement')
+                    ->icon('heroicon-o-document-text')
+                    ->schema([
+                        Forms\Components\Textarea::make('notes')
+                            ->label('Notes')
+                            ->placeholder('Reason for stock movement, reference numbers, or other details...')
+                            ->helperText('Optional: Add notes explaining why this movement occurred')
+                            ->maxLength(255)
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible()
+                    ->collapsed()
+                    ->columnSpanFull(),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
