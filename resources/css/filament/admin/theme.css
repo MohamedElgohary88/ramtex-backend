@@ -1,5 +1,210 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-@config "../../../../tailwind.config.js";
+@source '../../../../app/Filament/**/*.php';
+@source '../../../../resources/views/filament/**/*.blade.php';
+@source '../../../../vendor/filament/**/*.blade.php';
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+@import '/vendor/filament/filament/resources/css/theme.css';
+@import '/vendor/filament/forms/dist/module.esm.css';
+@import '/vendor/filament/tables/dist/module.esm.css';
+@import '/vendor/filament/notifications/dist/module.esm.css';
+@import '/vendor/filament/actions/dist/module.esm.css';
+
+@config '../../../../tailwind.config.js';
+
+@theme {
+    --font-sans: 'DM Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+:root {
+    --ramtex-page-bg-dark: #020617;
+    --ramtex-surface-dark: #0f172a;
+    --ramtex-border-dark: #1e293b;
+    --ramtex-text-dark: #f8fafc;
+}
+
+@layer base {
+    body.fi-body {
+        @apply font-sans antialiased bg-slate-50 text-slate-900;
+        background-image: radial-gradient(at 10% 20%, rgba(248, 250, 252, 0.8), transparent 55%),
+            radial-gradient(at 90% 10%, rgba(248, 250, 252, 0.6), transparent 45%);
+    }
+
+    body.fi-body.dark,
+    html.dark body.fi-body,
+    .dark body.fi-body {
+        background-color: var(--ramtex-page-bg-dark);
+        color: var(--ramtex-text-dark);
+    }
+}
+
+@layer components {
+    .fi-main {
+        @apply px-6 py-4 lg:px-8;
+    }
+
+    .fi-sidebar {
+        @apply bg-white/90 backdrop-blur border-r border-slate-200 shadow-xl shadow-slate-200/50 dark:bg-slate-950/90 dark:border-white/5 dark:shadow-black/40;
+    }
+
+    .fi-topbar {
+        @apply bg-white/90 backdrop-blur border-b border-slate-200 shadow-md shadow-slate-200/60 dark:bg-slate-950/80 dark:border-white/5;
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) {
+        color-scheme: dark;
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) :is(.fi-main, .fi-page, .fi-page > section) {
+        background-color: var(--ramtex-page-bg-dark) !important;
+        color: var(--ramtex-text-dark);
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) :is(
+        .fi-section,
+        .fi-fo-card,
+        .fi-fo-section,
+        .fi-fo-tabs,
+        .fi-fo-wizard,
+        .fi-fo-repeater,
+        .fi-fo-simple-repeater,
+        .fi-fo-builder,
+        .fi-widget,
+        .fi-card,
+        .fi-resource-relation-manager,
+        .fi-panel,
+        .fi-action-list,
+        .fi-table,
+        .fi-table-ctn
+    ) {
+        background-color: var(--ramtex-surface-dark) !important;
+        color: var(--ramtex-text-dark);
+        border-color: var(--ramtex-border-dark) !important;
+        box-shadow: 0 10px 40px rgba(2, 6, 23, 0.55);
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) :is(
+        .fi-ta,
+        .fi-ta-header,
+        .fi-ta-header-cell,
+        .fi-ta-col-header,
+        .fi-ta-footer,
+        .fi-ta-pagination,
+        .fi-ta-row,
+        .fi-ta-body-row,
+        .fi-ta-cell,
+        .fi-ta table,
+        .fi-table thead,
+        .fi-table tbody
+    ) {
+        background-color: var(--ramtex-surface-dark) !important;
+        color: var(--ramtex-text-dark) !important;
+        border-color: var(--ramtex-border-dark) !important;
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) :is(.fi-ta-row:nth-child(odd), .fi-ta-body-row:nth-child(odd)) {
+        background-color: #111c32 !important;
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) :is(.fi-ta-row:hover, .fi-ta-body-row:hover) {
+        background-color: #1f334f !important;
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) :is(
+        .fi-input,
+        .fi-input-wrp,
+        .fi-select,
+        .fi-select-wrp,
+        .fi-textarea,
+        input,
+        select,
+        textarea,
+        .fi-textarea-wrp,
+        .fi-fo-field-wrp,
+        .fi-fo-rich-editor,
+        .fi-fo-markdown-editor
+    ) {
+        background-color: #111c32 !important;
+        color: var(--ramtex-text-dark) !important;
+        border-color: var(--ramtex-border-dark) !important;
+        outline: none;
+        box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.4);
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) :is(input, select, textarea, .fi-input)::placeholder {
+        color: rgba(248, 250, 252, 0.6) !important;
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) :is(input:focus, select:focus, textarea:focus, .fi-input:focus, .fi-select:focus) {
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.35);
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) :is(
+        .fi-dropdown-panel,
+        .fi-modal-window,
+        .fi-modal-content,
+        .fi-modal-header,
+        .fi-modal-footer,
+        .fi-modal-body,
+        .fi-slide-over-panel,
+        .fi-notification,
+        .fi-toast,
+        .fi-panel-header,
+        .fi-panel-footer
+    ) {
+        background-color: var(--ramtex-surface-dark) !important;
+        color: var(--ramtex-text-dark) !important;
+        border-color: var(--ramtex-border-dark) !important;
+        backdrop-filter: blur(18px);
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) :is(.fi-modal-overlay, .fi-slide-over-overlay) {
+        background-color: rgba(2, 6, 23, 0.85) !important;
+    }
+
+    .fi-form-actions {
+        @apply w-full flex justify-end gap-3 flex-wrap;
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) .fi-form-actions {
+        background-color: rgba(2, 6, 23, 0.85);
+        border-radius: 1rem;
+        padding: 1rem;
+        border: 1px solid rgba(30, 41, 59, 0.8);
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) :is(.fi-ta-search-input, .fi-ta-filter-indicator, .fi-ta-per-page-select) {
+        background-color: #111c32 !important;
+        border-color: var(--ramtex-border-dark) !important;
+        color: var(--ramtex-text-dark) !important;
+    }
+
+    .fi-wi-stats-overview-stat {
+        @apply rounded-2xl border border-amber-100/60 bg-gradient-to-br from-amber-50 via-white to-white shadow-lg shadow-amber-200/50;
+    }
+
+    :is(html.dark, body.dark, body.fi-body.dark, .dark body) .fi-wi-stats-overview-stat {
+        background: radial-gradient(circle at top right, rgba(251, 191, 36, 0.2), transparent 40%) var(--ramtex-surface-dark);
+        border-color: rgba(251, 191, 36, 0.35);
+        color: var(--ramtex-text-dark);
+        box-shadow: 0 15px 50px rgba(2, 6, 23, 0.65);
+    }
+
+    .fi-resource-create-record-page .fi-form,
+    .fi-resource-edit-record-page .fi-form,
+    .fi-page .fi-form {
+        @apply w-full max-w-none;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fi-fo-component-ctn {
+        @apply w-full;
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .fi-fo-component-ctn > * {
+        grid-column: 1 / -1 !important;
+    }
+}
