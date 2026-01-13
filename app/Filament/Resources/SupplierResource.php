@@ -29,52 +29,118 @@ class SupplierResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Company Information')
+                    ->description('Supplier company details and tax information')
+                    ->icon('heroicon-o-building-office')
                     ->schema([
                         Forms\Components\TextInput::make('company_name')
                             ->label('Company Name')
-                            ->maxLength(255),
+                            ->placeholder('ABC Trading Co.')
+                            ->helperText('Official registered business name')
+                            ->maxLength(255)
+                            ->suffixIcon('heroicon-o-building-office-2')
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\TextInput::make('full_name')
                             ->label('Contact Person')
                             ->required()
-                            ->maxLength(255),
+                            ->placeholder('John Doe')
+                            ->helperText('Primary contact person at supplier')
+                            ->maxLength(255)
+                            ->suffixIcon('heroicon-o-user')
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\TextInput::make('financial_number')
                             ->label('Tax/VAT Number')
-                            ->maxLength(255),
-                    ])->columns(3),
+                            ->placeholder('12345678')
+                            ->helperText('Tax registration or VAT identification number')
+                            ->maxLength(255)
+                            ->suffixIcon('heroicon-o-identification')
+                            ->columnSpan(['md' => 1]),
+                    ])
+                    ->columns(['md' => 3])
+                    ->collapsible()
+                    ->columnSpanFull(),
 
                 Forms\Components\Section::make('Contact Details')
+                    ->description('Email and phone contact information')
+                    ->icon('heroicon-o-phone')
                     ->schema([
                         Forms\Components\TextInput::make('email')
+                            ->label('Email Address')
                             ->email()
-                            ->maxLength(255),
+                            ->placeholder('supplier@example.com')
+                            ->helperText('Primary email for communication')
+                            ->maxLength(255)
+                            ->suffixIcon('heroicon-o-envelope')
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\TextInput::make('phone')
+                            ->label('Phone Number')
                             ->tel()
-                            ->maxLength(255),
-                    ])->columns(2),
+                            ->placeholder('+961 1 234567')
+                            ->helperText('Primary contact phone number')
+                            ->maxLength(255)
+                            ->suffixIcon('heroicon-o-phone')
+                            ->columnSpan(['md' => 1]),
+                    ])
+                    ->columns(['md' => 2])
+                    ->collapsible()
+                    ->columnSpanFull(),
 
                 Forms\Components\Section::make('Address')
+                    ->description('Physical location and mailing address')
+                    ->icon('heroicon-o-map-pin')
                     ->schema([
                         Forms\Components\TextInput::make('address_line_1')
                             ->label('Address Line 1')
-                            ->maxLength(255),
+                            ->placeholder('123 Main Street')
+                            ->helperText('Street address or building name')
+                            ->maxLength(255)
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\TextInput::make('address_line_2')
                             ->label('Address Line 2')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('city')
-                            ->maxLength(255),
-                    ])->columns(3),
+                            ->placeholder('Suite 400')
+                            ->helperText('Optional: Apartment, floor, or unit')
+                            ->maxLength(255)
+                            ->columnSpan(['md' => 1]),
 
-                Forms\Components\Section::make('Settings')
+                        Forms\Components\TextInput::make('city')
+                            ->label('City')
+                            ->placeholder('Beirut')
+                            ->helperText('City or town')
+                            ->maxLength(255)
+                            ->columnSpan(['md' => 1]),
+                    ])
+                    ->columns(['md' => 3])
+                    ->collapsible()
+                    ->columnSpanFull(),
+
+                Forms\Components\Section::make('Settings & Notes')
+                    ->description('Supplier status and additional notes')
+                    ->icon('heroicon-o-cog-6-tooth')
                     ->schema([
                         Forms\Components\Toggle::make('is_active')
-                            ->label('Active')
+                            ->label('Active Status')
                             ->default(true)
-                            ->helperText('Inactive suppliers won\'t appear in purchase forms.'),
+                            ->helperText('Inactive suppliers won\'t appear in purchase forms')
+                            ->inline(false)
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\Textarea::make('notes')
+                            ->label('Notes')
+                            ->placeholder('Any internal notes about this supplier...')
+                            ->helperText('Optional: Terms, payment preferences, or other important information')
                             ->rows(3)
+                            ->maxLength(65535)
                             ->columnSpanFull(),
-                    ]),
-            ]);
+                    ])
+                    ->columns(['md' => 1])
+                    ->collapsible()
+                    ->collapsed()
+                    ->columnSpanFull(),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table

@@ -29,32 +29,57 @@ class InvoiceResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Invoice Details')
-                    ->columnSpanFull() // Ensure full width
-                    ->columns(3)
+                    ->description('Client, invoice number, and date information')
+                    ->icon('heroicon-o-document-text')
                     ->schema([
                         Forms\Components\Select::make('client_id')
+                            ->label('Client')
                             ->relationship('client', 'full_name')
                             ->searchable()
                             ->preload()
                             ->required()
+                            ->helperText('Select client for this invoice or create a new one')
+                            ->suffixIcon('heroicon-o-user')
                             ->createOptionForm([
-                                Forms\Components\TextInput::make('full_name')->required(),
-                                Forms\Components\TextInput::make('company_name'),
-                                Forms\Components\TextInput::make('phone'),
-                                Forms\Components\TextInput::make('email')->email(),
-                            ]),
+                                Forms\Components\TextInput::make('full_name')
+                                    ->required()
+                                    ->label('Full Name'),
+                                Forms\Components\TextInput::make('company_name')
+                                    ->label('Company Name'),
+                                Forms\Components\TextInput::make('phone')
+                                    ->label('Phone')
+                                    ->tel(),
+                                Forms\Components\TextInput::make('email')
+                                    ->label('Email')
+                                    ->email(),
+                            ])
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\TextInput::make('invoice_number')
+                            ->label('Invoice Number')
                             ->default(fn () => Invoice::generateInvoiceNumber())
                             ->required()
                             ->unique(ignoreRecord: true)
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->helperText('Invoice number is auto-generated but can be customized')
+                            ->suffixIcon('heroicon-o-hashtag')
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\DatePicker::make('invoice_date')
+                            ->label('Invoice Date')
                             ->default(now())
-                            ->required(),
-                    ]),
+                            ->required()
+                            ->helperText('Date when invoice was issued')
+                            ->suffixIcon('heroicon-o-calendar')
+                            ->columnSpan(['md' => 1]),
+                    ])
+                    ->columns(['md' => 3])
+                    ->collapsible()
+                    ->columnSpanFull(),
 
                 Forms\Components\Section::make('Invoice Items')
-                    ->columnSpanFull() // Ensure full width
+                    ->description('Products, quantities, and pricing')
+                    ->icon('heroicon-o-shopping-cart')
                     ->schema([
                         Forms\Components\Repeater::make('items')
                             ->relationship()
@@ -78,6 +103,7 @@ class InvoiceResource extends Resource
                                     })
                                     ->columnSpan(4),
                                 Forms\Components\TextInput::make('quantity')
+                                    ->label('Qty')
                                     ->numeric()
                                     ->required()
                                     ->default(1)
@@ -86,6 +112,7 @@ class InvoiceResource extends Resource
                                     ->afterStateUpdated(fn (Set $set, Get $get) => self::updateLineTotal($set, $get))
                                     ->columnSpan(2),
                                 Forms\Components\TextInput::make('unit_price')
+                                    ->label('Unit Price')
                                     ->numeric()
                                     ->required()
                                     ->prefix('$')
@@ -93,6 +120,7 @@ class InvoiceResource extends Resource
                                     ->afterStateUpdated(fn (Set $set, Get $get) => self::updateLineTotal($set, $get))
                                     ->columnSpan(3),
                                 Forms\Components\TextInput::make('total_line_price')
+                                    ->label('Line Total')
                                     ->numeric()
                                     ->prefix('$')
                                     ->disabled()
@@ -104,22 +132,39 @@ class InvoiceResource extends Resource
                             ->addActionLabel('Add Item')
                             ->reorderable(false)
                             ->collapsible()
-                            ->cloneable(),
-                    ]),
+                            ->cloneable()
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible()
+                    ->columnSpanFull(),
 
                 Forms\Components\Section::make('Totals & Notes')
-                    ->columnSpanFull() // Ensure full width
-                    ->columns(2)
+                    ->description('VAT rate and additional notes')
+                    ->icon('heroicon-o-calculator')
                     ->schema([
                         Forms\Components\TextInput::make('vat_rate')
+                            ->label('VAT Rate')
                             ->numeric()
                             ->suffix('%')
                             ->default(11)
-                            ->label('VAT Rate'),
+                            ->helperText('VAT percentage to apply to invoice total')
+                            ->suffixIcon('heroicon-o-percent-badge')
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\Textarea::make('notes')
-                            ->rows(3),
-                    ]),
-            ]);
+                            ->label('Notes')
+                            ->placeholder('Any special terms, conditions, or remarks for this invoice...')
+                            ->helperText('Optional: Additional notes to appear on invoice')
+                            ->rows(3)
+                            ->maxLength(65535)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(['md' => 1])
+                    ->collapsible()
+                    ->collapsed()
+                    ->columnSpanFull(),
+            ])
+            ->columns(1);
     }
 
     public static function updateLineTotal(Set $set, Get $get): void

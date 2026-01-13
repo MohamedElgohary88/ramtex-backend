@@ -34,28 +34,52 @@ class OfferResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Offer Details')
-                    ->columnSpanFull() // Ensure full width
+                    ->description('Client, offer number, date, and status')
+                    ->icon('heroicon-o-document-text')
                     ->schema([
                         Forms\Components\TextInput::make('offer_number')
+                            ->label('Offer Number')
                             ->disabled()
                             ->dehydrated(false)
-                            ->placeholder('Auto-generated'),
+                            ->placeholder('Auto-generated')
+                            ->helperText('Offer number is automatically generated upon creation')
+                            ->suffixIcon('heroicon-o-hashtag')
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\Select::make('client_id')
-                            ->relationship('client', 'full_name') // Assuming client has a full_name accessor or column, or concatenation in model
+                            ->label('Client')
+                            ->relationship('client', 'full_name')
                             ->searchable()
                             ->preload()
-                            ->required(),
+                            ->required()
+                            ->helperText('Select client for this offer')
+                            ->suffixIcon('heroicon-o-user')
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\DatePicker::make('offer_date')
+                            ->label('Offer Date')
                             ->default(now())
-                            ->required(),
+                            ->required()
+                            ->helperText('Date when offer was issued')
+                            ->suffixIcon('heroicon-o-calendar')
+                            ->columnSpan(['md' => 1]),
+
                         Forms\Components\Select::make('status')
+                            ->label('Status')
                             ->options(OfferStatus::class)
                             ->default(OfferStatus::DRAFT)
-                            ->required(),
-                    ])->columns(4),
+                            ->required()
+                            ->helperText('Current offer status')
+                            ->suffixIcon('heroicon-o-flag')
+                            ->columnSpan(['md' => 1]),
+                    ])
+                    ->columns(['md' => 4])
+                    ->collapsible()
+                    ->columnSpanFull(),
 
                 Forms\Components\Section::make('Offer Items')
-                    ->columnSpanFull() // Ensure full width
+                    ->description('Products, quantities, and pricing')
+                    ->icon('heroicon-o-shopping-cart')
                     ->schema([
                         Forms\Components\Repeater::make('items')
                             ->relationship()
@@ -82,6 +106,7 @@ class OfferResource extends Resource
                                     })
                                     ->columnSpan(4),
                                 Forms\Components\TextInput::make('quantity')
+                                    ->label('Qty')
                                     ->numeric()
                                     ->required()
                                     ->default(1)
@@ -90,6 +115,7 @@ class OfferResource extends Resource
                                     ->afterStateUpdated(fn (Set $set, Get $get) => self::updateLineTotal($set, $get))
                                     ->columnSpan(2),
                                 Forms\Components\TextInput::make('unit_price')
+                                    ->label('Unit Price')
                                     ->numeric()
                                     ->required()
                                     ->prefix('$')
@@ -97,6 +123,7 @@ class OfferResource extends Resource
                                     ->afterStateUpdated(fn (Set $set, Get $get) => self::updateLineTotal($set, $get))
                                     ->columnSpan(3),
                                 Forms\Components\TextInput::make('total_price')
+                                    ->label('Line Total')
                                     ->numeric()
                                     ->prefix('$')
                                     ->disabled()
@@ -107,19 +134,29 @@ class OfferResource extends Resource
                             ->defaultItems(1)
                             ->minItems(1)
                             ->reactive()
-                            ->afterStateUpdated(fn (Set $set, Get $get) => self::updateTotals($set, $get)),
-                    ]),
+                            ->afterStateUpdated(fn (Set $set, Get $get) => self::updateTotals($set, $get))
+                            ->addActionLabel('Add Item')
+                            ->reorderable(false)
+                            ->collapsible()
+                            ->cloneable()
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible()
+                    ->columnSpanFull(),
 
-                Forms\Components\Section::make('Totals')
-                    ->columns(2)
+                Forms\Components\Section::make('Totals & Notes')
+                    ->description('VAT, totals calculation, and additional notes')
+                    ->icon('heroicon-o-calculator')
                     ->schema([
                         Forms\Components\TextInput::make('vat_rate')
+                            ->label('VAT Rate')
                             ->numeric()
                             ->suffix('%')
                             ->default(11)
-                            ->label('VAT Rate')
+                            ->helperText('VAT percentage to apply')
                             ->reactive()
-                            ->afterStateUpdated(fn (Set $set, Get $get) => self::updateTotals($set, $get)),
+                            ->afterStateUpdated(fn (Set $set, Get $get) => self::updateTotals($set, $get))
+                            ->columnSpan(['md' => 1]),
                         
                         Forms\Components\Group::make()
                             ->schema([
@@ -127,25 +164,38 @@ class OfferResource extends Resource
                                     ->label('Subtotal')
                                     ->numeric()
                                     ->prefix('$')
-                                    ->readOnly(),
+                                    ->readOnly()
+                                    ->helperText('Total before VAT'),
                                 Forms\Components\TextInput::make('vat_amount')
                                     ->label('VAT Amount')
                                     ->numeric()
                                     ->prefix('$')
-                                    ->readOnly(),
+                                    ->readOnly()
+                                    ->helperText('Calculated VAT'),
                                 Forms\Components\TextInput::make('grand_total')
                                     ->label('Grand Total')
                                     ->numeric()
                                     ->prefix('$')
                                     ->readOnly()
+                                    ->helperText('Final amount including VAT')
                                     ->extraInputAttributes(['class' => 'font-bold text-lg']),
-                            ]),
+                            ])
+                            ->columnSpan(['md' => 1]),
                         
                         Forms\Components\Textarea::make('notes')
+                            ->label('Notes')
+                            ->placeholder('Any special terms, conditions, or remarks for this offer...')
+                            ->helperText('Optional: Additional notes to appear on offer')
                             ->rows(3)
+                            ->maxLength(65535)
                             ->columnSpanFull(),
-                    ]),
-            ]);
+                    ])
+                    ->columns(['md' => 2])
+                    ->collapsible()
+                    ->collapsed()
+                    ->columnSpanFull(),
+            ])
+            ->columns(1);
     }
 
     public static function updateLineTotal(Set $set, Get $get): void
