@@ -25,59 +25,169 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Product Information')
-                    ->columns(2)
-                    ->schema([
-                        Forms\Components\Select::make('category_id')
-                            ->relationship('category', 'name')
-                            ->required()
-                            ->searchable()
-                            ->preload(),
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('item_code')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(ignoreRecord: true)
-                            ->label('SKU / Code'),
-                        Forms\Components\Toggle::make('is_active')
-                            ->required()
-                            ->default(true),
-                    ]),
-
-                Forms\Components\Section::make('Media & Details')
-                    ->columns(1)
-                    ->schema([
-                        Forms\Components\FileUpload::make('image_path')
-                            ->image()
-                            ->directory('products')
-                            ->visibility('public'),
-                        Forms\Components\Textarea::make('description')
-                            ->columnSpanFull(),
-                    ]),
-
-                Forms\Components\Section::make('Pricing & Inventory')
-                    ->columns(3)
-                    ->schema([
-                        Forms\Components\TextInput::make('price')
-                            ->required()
-                            ->numeric()
-                            ->default(0.00)
-                            ->prefix('$')
-                            ->label('Retail Price'),
-                        Forms\Components\TextInput::make('wholesale_price')
-                            ->required()
-                            ->numeric()
-                            ->default(0.00)
-                            ->prefix('$'),
-                        Forms\Components\TextInput::make('min_stock_alert')
-                            ->required()
-                            ->numeric()
-                            ->default(10)
-                            ->label('Low Stock Alert Level'),
-                    ]),
-            ]);
+                Forms\Components\Tabs::make('Product Information')
+                    ->tabs([
+                        // Details Tab
+                        Forms\Components\Tabs\Tab::make('Details')
+                            ->icon('heroicon-o-cube')
+                            ->schema([
+                                Forms\Components\Section::make('Basic Information')
+                                    ->description('Product name, SKU, category, and status')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name')
+                                            ->label('Product Name')
+                                            ->required()
+                                            ->placeholder('Product title')
+                                            ->helperText('The main display name for this product')
+                                            ->maxLength(255)
+                                            ->columnSpan(['md' => 2]),
+                                        
+                                        Forms\Components\TextInput::make('item_code')
+                                            ->label('SKU / Item Code')
+                                            ->required()
+                                            ->placeholder('PROD-001')
+                                            ->helperText('Unique product identifier for inventory tracking')
+                                            ->maxLength(255)
+                                            ->unique(ignoreRecord: true)
+                                            ->suffixIcon('heroicon-o-qr-code')
+                                            ->columnSpan(['md' => 1]),
+                                        
+                                        Forms\Components\Toggle::make('is_active')
+                                            ->label('Active')
+                                            ->helperText('Inactive products won\'t appear in sales')
+                                            ->inline(false)
+                                            ->required()
+                                            ->default(true)
+                                            ->columnSpan(['md' => 1]),
+                                        
+                                        Forms\Components\Select::make('category_id')
+                                            ->label('Category')
+                                            ->relationship('category', 'name')
+                                            ->required()
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Product category for organization')
+                                            ->suffixIcon('heroicon-o-tag')
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('name')
+                                                    ->required()
+                                                    ->maxLength(255)
+                                                    ->live(onBlur: true)
+                                                    ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                                                Forms\Components\TextInput::make('slug')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Forms\Components\Toggle::make('is_active')
+                                                    ->default(true),
+                                            ])
+                                            ->columnSpan(['md' => 2]),
+                                    ])
+                                    ->columns(['md' => 4])
+                                    ->columnSpanFull(),
+                                
+                                Forms\Components\Section::make('Description')
+                                    ->description('Product description and details')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('description')
+                                            ->label('Product Description')
+                                            ->placeholder('Detailed product information, features, specifications...')
+                                            ->helperText('Describe the product features, benefits, and specifications')
+                                            ->rows(5)
+                                            ->maxLength(65535)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columnSpanFull(),
+                            ]),
+                        
+                        // Media Tab
+                        Forms\Components\Tabs\Tab::make('Media')
+                            ->icon('heroicon-o-photo')
+                            ->schema([
+                                Forms\Components\Section::make('Product Images')
+                                    ->description('Upload product photos and images')
+                                    ->schema([
+                                        Forms\Components\FileUpload::make('image_path')
+                                            ->label('Product Image')
+                                            ->image()
+                                            ->directory('products')
+                                            ->visibility('public')
+                                            ->imageEditor()
+                                            ->imageEditorAspectRatios([
+                                                '1:1',
+                                                '4:3',
+                                                '16:9',
+                                            ])
+                                            ->helperText('Upload a high-quality product image (recommended: square format)')
+                                            ->maxSize(2048)
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columnSpanFull(),
+                            ]),
+                        
+                        // Pricing & Stock Tab
+                        Forms\Components\Tabs\Tab::make('Pricing & Stock')
+                            ->icon('heroicon-o-currency-dollar')
+                            ->schema([
+                                Forms\Components\Section::make('Pricing')
+                                    ->description('Product pricing information')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('price')
+                                            ->label('Retail Price')
+                                            ->required()
+                                            ->numeric()
+                                            ->default(0.00)
+                                            ->prefix('$')
+                                            ->helperText('Regular selling price to customers')
+                                            ->minValue(0)
+                                            ->step(0.01)
+                                            ->columnSpan(['md' => 1]),
+                                        
+                                        Forms\Components\TextInput::make('wholesale_price')
+                                            ->label('Wholesale Price')
+                                            ->required()
+                                            ->numeric()
+                                            ->default(0.00)
+                                            ->prefix('$')
+                                            ->helperText('Bulk or wholesale price for resellers')
+                                            ->minValue(0)
+                                            ->step(0.01)
+                                            ->columnSpan(['md' => 1]),
+                                    ])
+                                    ->columns(['md' => 2])
+                                    ->columnSpanFull(),
+                                
+                                Forms\Components\Section::make('Inventory')
+                                    ->description('Stock levels and alerts')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('stock_on_hand')
+                                            ->label('Current Stock')
+                                            ->numeric()
+                                            ->default(0)
+                                            ->helperText('Current quantity in stock (updated automatically by system)')
+                                            ->disabled()
+                                            ->dehydrated(false)
+                                            ->suffixIcon('heroicon-o-cube')
+                                            ->columnSpan(['md' => 1]),
+                                        
+                                        Forms\Components\TextInput::make('min_stock_alert')
+                                            ->label('Low Stock Alert Level')
+                                            ->required()
+                                            ->numeric()
+                                            ->default(10)
+                                            ->helperText('System alerts when stock falls below this level')
+                                            ->minValue(0)
+                                            ->suffixIcon('heroicon-o-exclamation-triangle')
+                                            ->columnSpan(['md' => 1]),
+                                    ])
+                                    ->columns(['md' => 2])
+                                    ->columnSpanFull(),
+                            ]),
+                    ])
+                    ->columnSpanFull()
+                    ->persistTabInQueryString(),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
