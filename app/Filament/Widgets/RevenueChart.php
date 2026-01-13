@@ -15,9 +15,9 @@ class RevenueChart extends ChartWidget
 
     protected static ?int $sort = 2;
 
-    protected int | string | array $columnSpan = 1;
+    protected int | string | array $columnSpan = 2;
 
-    protected static ?string $maxHeight = '320px';
+    protected static ?string $maxHeight = '300px';
 
     protected function getData(): array
     {
@@ -32,15 +32,17 @@ class RevenueChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Revenue',
-                    'data' => $data->map(fn (TrendValue $value) => $value->aggregate),
+                    'label' => 'Daily Revenue',
+                    'data' => $data->map(fn (TrendValue $value) => round($value->aggregate, 2)),
                     'fill' => 'start',
-                    'borderColor' => '#f59e0b',
+                    'borderColor' => 'rgb(245, 158, 11)', // Amber
                     'backgroundColor' => 'rgba(245, 158, 11, 0.1)',
                     'tension' => 0.4,
-                    'pointBackgroundColor' => '#f59e0b',
+                    'pointBackgroundColor' => 'rgb(245, 158, 11)',
                     'pointBorderColor' => '#ffffff',
                     'pointBorderWidth' => 2,
+                    'pointRadius' => 3,
+                    'pointHoverRadius' => 5,
                 ],
             ],
             'labels' => $data->map(fn (TrendValue $value) => \Carbon\Carbon::parse($value->date)->format('M d')),
@@ -55,28 +57,70 @@ class RevenueChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'responsive' => true,
+            'maintainAspectRatio' => true,
             'plugins' => [
                 'legend' => [
                     'display' => false,
                 ],
+                'tooltip' => [
+                    'enabled' => true,
+                    'mode' => 'index',
+                    'intersect' => false,
+                    'backgroundColor' => 'rgba(0, 0, 0, 0.8)',
+                    'titleColor' => '#ffffff',
+                    'bodyColor' => '#ffffff',
+                    'borderColor' => 'rgba(245, 158, 11, 0.5)',
+                    'borderWidth' => 1,
+                    'padding' => 12,
+                    'displayColors' => false,
+                    'callbacks' => [
+                        'label' => 'function(context) { return "$" + context.parsed.y.toFixed(2); }',
+                    ],
+                ],
             ],
             'scales' => [
                 'y' => [
+                    'beginAtZero' => true,
                     'grid' => [
-                        'color' => 'rgba(255, 255, 255, 0.05)',
+                        'display' => true,
+                        'color' => 'rgba(156, 163, 175, 0.1)',
+                        'drawBorder' => false,
                     ],
                     'ticks' => [
-                        'color' => 'rgba(255, 255, 255, 0.5)',
+                        'color' => 'rgba(156, 163, 175, 0.7)',
+                        'font' => [
+                            'size' => 11,
+                        ],
+                        'callback' => 'function(value) { return "$" + value; }',
+                    ],
+                    'border' => [
+                        'display' => false,
                     ],
                 ],
                 'x' => [
                     'grid' => [
                         'display' => false,
+                        'drawBorder' => false,
                     ],
                     'ticks' => [
-                        'color' => 'rgba(255, 255, 255, 0.5)',
+                        'color' => 'rgba(156, 163, 175, 0.7)',
+                        'font' => [
+                            'size' => 11,
+                        ],
+                        'maxRotation' => 0,
+                        'autoSkip' => true,
+                        'maxTicksLimit' => 8,
+                    ],
+                    'border' => [
+                        'display' => false,
                     ],
                 ],
+            ],
+            'interaction' => [
+                'mode' => 'nearest',
+                'axis' => 'x',
+                'intersect' => false,
             ],
         ];
     }
