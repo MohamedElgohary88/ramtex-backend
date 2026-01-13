@@ -680,7 +680,6 @@ input[type="checkbox"]:focus {
     background: var(--surface-card) !important;
     margin-top: var(--spacing-xl) !important;
     border-radius: var(--radius-lg) !important;
-    /* Remove sticky positioning - make inline */
     position: static !important;
 }
 
@@ -688,10 +687,8 @@ input[type="checkbox"]:focus {
 .fi-page-edit .fi-form-actions,
 .fi-page-create .fi-form-actions {
     position: static !important;
-    /* Remove sticky behavior */
     bottom: auto !important;
     z-index: auto !important;
-    /* Subtle shadow for visual separation */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06) !important;
     width: 100% !important;
     max-width: 100% !important;
