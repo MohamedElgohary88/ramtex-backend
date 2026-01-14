@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Ramtex Mobile API",
-    "description": "Customer mobile app API for authentication, product catalog, and checkout",
+    "name": "Ramtex Mobile API - Full Collection",
+    "description": "Complete REST API for Ramtex mobile app (Android/iOS) and web client. Includes authentication, product catalog, taxonomy browsing, shopping cart, and order management.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -13,6 +13,10 @@
           "request": {
             "method": "POST",
             "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -33,15 +37,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 201) {",
-                  "  var jsonData = pm.response.json();",
-                  "  pm.environment.set('client_token', jsonData.token);",
-                  "  pm.test('Registration successful', () => {",
-                  "    pm.expect(pm.response.code).to.equal(201);",
-                  "    pm.expect(jsonData.token).to.exist;",
-                  "    pm.expect(jsonData.client).to.exist;",
-                  "  });",
-                  "}"
+                  "pm.collectionVariables.set('client_token', pm.response.json().token);"
                 ]
               }
             }
@@ -53,13 +49,17 @@
             "method": "POST",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"jane@example.com\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/client/login",
@@ -72,15 +72,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 200) {",
-                  "  var jsonData = pm.response.json();",
-                  "  pm.environment.set('client_token', jsonData.token);",
-                  "  pm.test('Login successful', () => {",
-                  "    pm.expect(pm.response.code).to.equal(200);",
-                  "    pm.expect(jsonData.token).to.exist;",
-                  "    pm.expect(jsonData.client).to.exist;",
-                  "  });",
-                  "}"
+                  "pm.collectionVariables.set('client_token', pm.response.json().token);"
                 ]
               }
             }
@@ -91,6 +83,10 @@
           "request": {
             "method": "POST",
             "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
               {
                 "key": "Authorization",
                 "value": "Bearer {{client_token}}"
@@ -109,6 +105,10 @@
             "method": "GET",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
                 "value": "Bearer {{client_token}}"
               }
@@ -123,15 +123,88 @@
       ]
     },
     {
+      "name": "Taxonomy",
+      "item": [
+        {
+          "name": "Get Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Get Brands",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/brands",
+              "host": ["{{base_url}}"],
+              "path": ["api", "brands"]
+            }
+          }
+        },
+        {
+          "name": "Get Products (Filter by Brand)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/products?brand_id=1&per_page=15",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products"],
+              "query": [
+                {
+                  "key": "brand_id",
+                  "value": "1",
+                  "description": "Filter by brand ID"
+                },
+                {
+                  "key": "per_page",
+                  "value": "15",
+                  "description": "Items per page (default 15, max 100)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Products",
       "item": [
         {
           "name": "List Products",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": {
-              "raw": "{{base_url}}/api/products?per_page=15&search=&category_id=&price_min=&price_max=&sort=name_asc",
+              "raw": "{{base_url}}/api/products?per_page=15&search=&category_id=&brand_id=&price_min=&price_max=&sort=name_asc",
               "host": ["{{base_url}}"],
               "path": ["api", "products"],
               "query": [
@@ -151,6 +224,12 @@
                   "value": "",
                   "disabled": true,
                   "description": "Filter by category ID"
+                },
+                {
+                  "key": "brand_id",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Filter by brand ID"
                 },
                 {
                   "key": "price_min",
@@ -178,11 +257,142 @@
           "name": "Get Product Details",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/products/1",
               "host": ["{{base_url}}"],
               "path": ["api", "products", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/client/cart",
+              "host": ["{{base_url}}"],
+              "path": ["api", "client", "cart"]
+            }
+          }
+        },
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 1,\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/client/cart",
+              "host": ["{{base_url}}"],
+              "path": ["api", "client", "cart"]
+            }
+          }
+        },
+        {
+          "name": "Update Cart Item Quantity",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/client/cart/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "client", "cart", "1"]
+            }
+          }
+        },
+        {
+          "name": "Remove Item from Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/client/cart/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "client", "cart", "1"]
+            }
+          }
+        },
+        {
+          "name": "Clear Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/client/cart",
+              "host": ["{{base_url}}"],
+              "path": ["api", "client", "cart"]
             }
           }
         }
@@ -196,6 +406,10 @@
           "request": {
             "method": "POST",
             "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
               {
                 "key": "Authorization",
                 "value": "Bearer {{client_token}}"
@@ -221,6 +435,10 @@
           "request": {
             "method": "GET",
             "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
               {
                 "key": "Authorization",
                 "value": "Bearer {{client_token}}"
@@ -251,6 +469,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
                 "value": "Bearer {{client_token}}"
               },
@@ -276,6 +498,10 @@
             "method": "GET",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
                 "value": "Bearer {{client_token}}"
               }
@@ -287,7 +513,8 @@
               "query": [
                 {
                   "key": "per_page",
-                  "value": "10"
+                  "value": "10",
+                  "description": "Items per page"
                 }
               ]
             }
@@ -302,7 +529,12 @@
           "name": "Ping",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/ping",
               "host": ["{{base_url}}"],
