@@ -36,10 +36,11 @@ class ProductController extends Controller
 
         $query = Product::query()
             ->where('is_active', true)
-            ->with('category:id,name,slug')
+            ->with(['category:id,name,slug', 'brand:id,name,slug,image'])
             ->select([
                 'id',
                 'category_id',
+                'brand_id',
                 'name',
                 'item_code',
                 'description',
@@ -63,6 +64,11 @@ class ProductController extends Controller
         // Filter by category
         $query->when($request->filled('category_id'), function ($q) use ($request) {
             $q->where('category_id', $request->query('category_id'));
+        });
+
+        // Filter by brand
+        $query->when($request->filled('brand_id'), function ($q) use ($request) {
+            $q->where('brand_id', $request->query('brand_id'));
         });
 
         // Filter by price range
@@ -113,7 +119,7 @@ class ProductController extends Controller
         }
 
         return response()->json([
-            'data' => new ProductResource($product->load('category')),
+            'data' => new ProductResource($product->load(['category', 'brand'])),
         ], 200);
     }
 }

@@ -58,4 +58,9 @@ class Client extends Authenticatable
         return $this->belongsToMany(Product::class, 'client_product')
             ->withTimestamps();
     }
+
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
+    }
 }

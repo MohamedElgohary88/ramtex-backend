@@ -81,6 +81,35 @@ class ProductResource extends Resource
                                                     ->default(true),
                                             ])
                                             ->columnSpan(['md' => 2]),
+
+                                        Forms\Components\Select::make('brand_id')
+                                            ->label('Brand')
+                                            ->relationship('brand', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Optional: associate this product with a brand')
+                                            ->suffixIcon('heroicon-o-sparkles')
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('name')
+                                                    ->required()
+                                                    ->maxLength(255)
+                                                    ->live(onBlur: true)
+                                                    ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                                                Forms\Components\TextInput::make('slug')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Forms\Components\Toggle::make('is_active')
+                                                    ->default(true),
+                                                Forms\Components\FileUpload::make('image')
+                                                    ->label('Logo')
+                                                    ->image()
+                                                    ->directory('brands')
+                                                    ->visibility('public')
+                                                    ->maxSize(2048)
+                                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                                    ->columnSpanFull(),
+                                            ])
+                                            ->columnSpan(['md' => 2]),
                                     ])
                                     ->columns(['md' => 4])
                                     ->columnSpanFull(),
@@ -211,6 +240,11 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('category.name')
                     ->sortable()
                     ->badge(),
+                Tables\Columns\TextColumn::make('brand.name')
+                    ->label('Brand')
+                    ->sortable()
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('price')
                     ->money('USD')
                     ->sortable(),
@@ -229,6 +263,8 @@ class ProductResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('category')
                     ->relationship('category', 'name'),
+                Tables\Filters\SelectFilter::make('brand')
+                    ->relationship('brand', 'name'),
                 Tables\Filters\TernaryFilter::make('is_active'),
             ])
             ->actions([

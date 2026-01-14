@@ -26,6 +26,12 @@ class ProductResource extends JsonResource
                 'name' => $this->category?->name,
                 'slug' => $this->category?->slug,
             ],
+            'brand' => [
+                'id' => $this->brand?->id,
+                'name' => $this->brand?->name,
+                'slug' => $this->brand?->slug,
+                'logo_url' => $this->brand?->image ? asset('storage/' . $this->brand->image) : null,
+            ],
             'price' => (float) $this->price,
             'image_url' => $this->image_path ? asset('storage/' . $this->image_path) : null,
             'stock_available' => $this->stock_on_hand,
