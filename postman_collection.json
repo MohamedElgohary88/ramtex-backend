@@ -9,6 +9,45 @@
       "name": "Authentication",
       "item": [
         {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Jane Smith\",\n  \"email\": \"jane@example.com\",\n  \"phone\": \"+961-71-987-654\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\",\n  \"company_name\": \"Test Corp\",\n  \"city\": \"Beirut\",\n  \"country\": \"Lebanon\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/client/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "client", "register"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.environment.set('client_token', jsonData.token);",
+                  "  pm.test('Registration successful', () => {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "    pm.expect(jsonData.token).to.exist;",
+                  "    pm.expect(jsonData.client).to.exist;",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Login",
           "request": {
             "method": "POST",
@@ -92,13 +131,44 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/products?per_page=15",
+              "raw": "{{base_url}}/api/products?per_page=15&search=&category_id=&price_min=&price_max=&sort=name_asc",
               "host": ["{{base_url}}"],
               "path": ["api", "products"],
               "query": [
                 {
                   "key": "per_page",
-                  "value": "15"
+                  "value": "15",
+                  "description": "Items per page (default 15, max 100)"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Search by name, item_code, or description"
+                },
+                {
+                  "key": "category_id",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Filter by category ID"
+                },
+                {
+                  "key": "price_min",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Minimum price (inclusive)"
+                },
+                {
+                  "key": "price_max",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Maximum price (inclusive)"
+                },
+                {
+                  "key": "sort",
+                  "value": "name_asc",
+                  "disabled": true,
+                  "description": "Sort: price_asc, price_desc, newest, name_asc"
                 }
               ]
             }
@@ -113,6 +183,60 @@
               "raw": "{{base_url}}/api/products/1",
               "host": ["{{base_url}}"],
               "path": ["api", "products", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Favorites",
+      "item": [
+        {
+          "name": "Toggle Favorite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/client/favorites",
+              "host": ["{{base_url}}"],
+              "path": ["api", "client", "favorites"]
+            }
+          }
+        },
+        {
+          "name": "List Favorites",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{client_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/client/favorites?per_page=15",
+              "host": ["{{base_url}}"],
+              "path": ["api", "client", "favorites"],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "15",
+                  "description": "Items per page (default 15, max 100)"
+                }
+              ]
             }
           }
         }
