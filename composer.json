@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "bezhansalleh/filament-shield": "^3.9",
+        "brick/math": "^0.14.1",
         "filament/filament": "^3.2",
         "flowframe/laravel-trend": "^0.4.0",
         "laravel/framework": "^12.0",

@@ -43,4 +43,10 @@ class Product extends Model
     {
         return $this->hasMany(StockMovement::class);
     }
+
+    public function favoritedBy(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Client::class, 'client_product')
+            ->withTimestamps();
+    }
 }
