@@ -93,6 +93,30 @@ class ClientResource extends Resource
                             ->columns(3)
                             ->columnSpanFull(),
 
+                        // Commercial Settings
+                        Forms\Components\Section::make('Commercial Settings')
+                            ->icon('heroicon-o-currency-dollar')
+                            ->schema([
+                                Forms\Components\Select::make('price_list_id')
+                                    ->relationship('priceList', 'name')
+                                    ->preload()
+                                    ->searchable()
+                                    ->label('Assigned Price List')
+                                    ->helperText('Client will see prices from this list if product exists in it.')
+                                    ->columnSpan(2),
+                                
+                                Forms\Components\TextInput::make('financial_number')
+                                    ->label('Tax/Financial Number')
+                                    ->columnSpan(1),
+                                
+                                Forms\Components\Textarea::make('bank_details')
+                                    ->label('Bank Details')
+                                    ->rows(2)
+                                    ->columnSpanFull(),
+                            ])
+                            ->columns(3)
+                            ->columnSpanFull(),
+
                     ])
                     ->columnSpanFull() // ده أهم سطر: بيخلي الجروب ده يفرش في الصفحة كلها
             ]);
