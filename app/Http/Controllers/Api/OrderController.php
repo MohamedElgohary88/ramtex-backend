@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\StoreOrderRequest;
 use App\Http\Resources\InvoiceResource;
 use App\Models\Client;
-use App\Models\Invoice;
-use App\Models\Product;
 use App\Services\InvoiceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,42 +22,45 @@ class OrderController extends Controller
      * POST /api/client/orders
      *
      * Create a new order (invoice) from mobile app.
-     * Validates stock availability and creates invoice in draft state.
+     * Automatically fetches all items from the client's cart.
+     * Validates cart is not empty, products exist, are active, and have sufficient stock.
+     * Clears the cart after successful order creation.
      *
-     * @param  StoreOrderRequest  $request
+     * @param  Request  $request
      * @return JsonResponse
      *
      * @throws ValidationException
      */
-    public function store(StoreOrderRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
         /** @var Client $client */
         $client = $request->user('client-api');
 
-        $validated = $request->validated();
-        $items = $validated['items'];
+        // Fetch all cart items for this client
+        $cartItems = $client->cartItems()
+            ->with('product')
+            ->get();
+
+        // Validate cart is not empty
+        if ($cartItems->isEmpty()) {
+            throw ValidationException::withMessages([
+                'cart' => 'Your cart is empty. Please add items before placing an order.',
+            ]);
+        }
 
         // Validate products exist, are active, and have sufficient stock
-        $productIds = collect($items)->pluck('product_id')->unique();
-        $products = Product::whereIn('id', $productIds)
-            ->where('is_active', true)
-            ->get()
-            ->keyBy('id');
-
         $preparedItems = [];
 
-        foreach ($items as $item) {
-            $productId = $item['product_id'];
-            $quantity = $item['quantity'];
+        foreach ($cartItems as $cartItem) {
+            $product = $cartItem->product;
+            $quantity = $cartItem->quantity;
 
-            // Product exists and is active
-            if (! isset($products[$productId])) {
+            // Verify product is still active
+            if (! $product->is_active) {
                 throw ValidationException::withMessages([
-                    'items' => "Product ID {$productId} does not exist or is inactive.",
+                    'items' => "{$product->name} is no longer available.",
                 ]);
             }
-
-            $product = $products[$productId];
 
             // Check stock availability
             if ($product->stock_on_hand < $quantity) {
@@ -71,7 +71,7 @@ class OrderController extends Controller
 
             // Prepare item for InvoiceService
             $preparedItems[] = [
-                'product_id' => $productId,
+                'product_id' => $product->id,
                 'quantity' => $quantity,
                 'unit_price' => (float) $product->price, // Use sell price
             ];
@@ -82,12 +82,15 @@ class OrderController extends Controller
             client: $client,
             items: $preparedItems,
             vatRate: 0, // No VAT for mobile orders (business rule)
-            notes: $validated['notes'] ?? null
+            notes: $request->input('notes') // Optional order notes
         );
+
+        // Clear the cart after successful order creation
+        $client->cartItems()->delete();
 
         return response()->json([
             'message' => 'Order created successfully.',
-            'order' => new InvoiceResource($invoice->load('items.product')),
+            'data' => new InvoiceResource($invoice->load('items.product')),
         ], 201);
     }
 

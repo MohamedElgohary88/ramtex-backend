@@ -483,13 +483,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"product_id\": 1,\n      \"quantity\": 2\n    },\n    {\n      \"product_id\": 2,\n      \"quantity\": 5\n    }\n  ],\n  \"notes\": \"Please deliver after 5 PM\"\n}"
+              "raw": "{\n  \"notes\": \"Please deliver after 5 PM. Leave at door.\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/client/orders",
               "host": ["{{base_url}}"],
               "path": ["api", "client", "orders"]
-            }
+            },
+            "description": "Create order from all items in the client's cart. Cart must not be empty. Cart is automatically cleared after successful order creation."
           }
         },
         {

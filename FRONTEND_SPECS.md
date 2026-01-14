@@ -934,6 +934,8 @@ None. Simple DELETE request.
 
 ### 4.5 Checkout (Place Order)
 
+**Purpose:** Create an order from all items currently in the customer's shopping cart.
+
 **Related Endpoint:**
 ```
 POST /api/client/orders
@@ -945,46 +947,38 @@ POST /api/client/orders
 
 | Field | Type | Required | Description | Example |
 |-------|------|----------|-------------|---------|
-| `items[].product_id` | integer | Yes | Product ID | `1` |
-| `items[].quantity` | integer | Yes | Quantity to order | `2` |
 | `notes` | string | No | Special delivery/order notes | `Leave at door, please.` |
 
 **Request Example:**
 ```json
 {
-  "items": [
-    {
-      "product_id": 1,
-      "quantity": 2
-    },
-    {
-      "product_id": 2,
-      "quantity": 3
-    }
-  ],
   "notes": "Please deliver after 5 PM. Leave at door."
 }
 ```
+
+**Important:** The API **automatically fetches all items from the client's cart**. Do NOT send item details in the request. The endpoint will return an error if the cart is empty.
 
 #### Data Returned from API (Response)
 
 | Field | Type | Description | Example | UI Hint |
 |-------|------|-------------|---------|---------|
-| `message` | string | Success message | `Order created successfully` | Show confirmation screen |
+| `message` | string | Success message | `Order created successfully.` | Show confirmation screen |
 | `data.id` | integer | Order/Invoice ID | `10` | Display as "Order #10" |
 | `data.invoice_number` | string | Invoice reference | `INV-2026-001` | Display on confirmation |
 | `data.status` | string | Order status | `draft` | Initial status is draft, can be confirmed by admin |
 | `data.total_amount` | float | Order total | `209.95` | Display on confirmation |
 | `data.created_at` | timestamp | Order time | `2026-01-14T12:00:00.000000Z` | Format as "Jan 14, 2026 at 12:00 PM" |
+| `data.notes` | string | Order notes | `Leave at door.` | Display if present |
 | `data.items[].product_id` | integer | Product ID | `1` | Reference |
+| `data.items[].product_name` | string | Product name | `Cotton T-Shirt` | Display in confirmation |
 | `data.items[].quantity` | integer | Ordered quantity | `2` | Confirmation list |
 | `data.items[].price` | float | Unit price | `29.99` | Confirmation |
 | `data.items[].subtotal` | float | Line total | `59.98` | Confirmation |
 
-**Response Example (201 Created):**
+**Response Example (Success - 201 Created):**
 ```json
 {
-  "message": "Order created successfully",
+  "message": "Order created successfully.",
   "data": {
     "id": 10,
     "invoice_number": "INV-2026-001",
@@ -1014,22 +1008,42 @@ POST /api/client/orders
 }
 ```
 
+**Error Example (Empty Cart - 422 Unprocessable Entity):**
+```json
+{
+  "message": "Your cart is empty. Please add items before placing an order.",
+  "errors": {
+    "cart": ["Your cart is empty. Please add items before placing an order."]
+  }
+}
+```
+
+**Error Example (Insufficient Stock - 422):**
+```json
+{
+  "message": "Insufficient stock for Cotton T-Shirt. Available: 5, Requested: 10.",
+  "errors": {
+    "items": ["Insufficient stock for Cotton T-Shirt. Available: 5, Requested: 10."]
+  }
+}
+```
+
 **UI Implementation:**
-- "Proceed to Checkout" button on Cart screen
-- Optional: Checkout screen with:
-  - Order summary (items, quantities, prices)
-  - Notes text area (optional)
+- **Cart Screen:** Show "Proceed to Checkout" button (enabled only if cart has items)
+- **Optional Checkout Screen:**
+  - Display order summary (items, quantities, prices, total)
+  - Notes textarea (optional)
   - "Place Order" button (CTA)
-- Show loading spinner while processing
-- On success (201):
+  - Show loading spinner while processing
+- **On Success (201 Created):**
   - Navigate to Order Confirmation screen
   - Display "Order Placed Successfully!"
-  - Show Order #, total, items, and estimated delivery info
+  - Show Order #, invoice number, total, items, and timestamps
+  - **CRITICAL:** Cart is automatically cleared by the API (no need to call `DELETE /api/client/cart`)
   - Provide "View Order Details" and "Continue Shopping" buttons
-  - **IMPORTANT:** Clear cart after successful order (optional: pre-fetch cart to confirm it's empty)
-- On error (422):
-  - Show validation errors: "Stock exceeded for X product"
-  - Allow user to go back to cart and adjust quantities
+- **On Error (422):**
+  - **If "cart is empty":** Show alert and redirect user back to Home/Products screen
+  - **If "insufficient stock":** Show validation error and allow user to adjust quantities in Cart screen before retrying checkout
 
 ---
 
