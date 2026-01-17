@@ -122,8 +122,11 @@ class ClientAuthController extends Controller
      */
     public function me(Request $request): JsonResponse
     {
+        /** @var \App\Models\Client $client */
+        $client = $request->user();
+        
         return response()->json([
-            'client' => new ClientResource($request->user()),
+            'client' => new ClientResource($client->load('salesRep')),
         ]);
     }
 }

@@ -34,6 +34,9 @@ class ProductController extends Controller
         $perPage = (int) $request->query('per_page', 15);
         $perPage = min($perPage, 100);
 
+        /** @var \App\Models\Client|null $client */
+        $client = $request->user('client-api');
+
         $query = Product::query()
             ->where('is_active', true)
             ->with(['category:id,name,slug', 'brand:id,name,slug,image'])
@@ -50,6 +53,13 @@ class ProductController extends Controller
                 'stock_on_hand',
                 'created_at',
             ]);
+
+        // Eager load custom pricing for logged-in client to prevent N+1
+        if ($client) {
+            $query->with(['clientsWithCustomPrice' => function ($q) use ($client) {
+                $q->where('tbm_products_client.client_id', $client->id);
+            }]);
+        }
 
         // Search: fuzzy match on name, item_code, or description
         $query->when($request->filled('search'), function ($q) use ($request) {

@@ -56,4 +56,10 @@ class Product extends Model
         return $this->belongsToMany(Client::class, 'client_product')
             ->withTimestamps();
     }
+
+    public function clientsWithCustomPrice(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Client::class, 'tbm_products_client', 'products_id', 'client_id')
+            ->withPivot('price');
+    }
 }

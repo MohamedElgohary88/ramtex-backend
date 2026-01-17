@@ -42,20 +42,41 @@ class CurrencyService
             throw new InvalidArgumentException('Exchange rates must be positive values.');
         }
 
+        // Logic: Rates are stored as "Units per 1 Base Currency" (e.g., LBP 89500 = 1 USD)
+        // Step 1: Convert FROM -> BASE (Division)
+        // Step 2: Convert BASE -> TO (Multiplication)
+        
         $decimalAmount = BigDecimal::of((string) $amount);
-        $baseValue = $decimalAmount->multipliedBy(BigDecimal::of($from->exchange_rate));
+        
+        // From -> Base
+        $baseValue = $decimalAmount->dividedBy(
+            divisor: BigDecimal::of($from->exchange_rate),
+            scale: 20, // Intermediate precision
+            roundingMode: RoundingMode::HALF_UP
+        );
 
         if ($to->is_base) {
             return $baseValue->toScale($to->decimal_precision, RoundingMode::HALF_UP);
         }
 
-        $result = $baseValue->dividedBy(
-            divisor: BigDecimal::of($to->exchange_rate),
-            scale: max($scale, $to->decimal_precision),
-            roundingMode: RoundingMode::HALF_UP,
-        );
+        // Base -> To
+        $result = $baseValue->multipliedBy(BigDecimal::of($to->exchange_rate));
 
         return $result->toScale($to->decimal_precision, RoundingMode::HALF_UP);
+    }
+
+    /**
+     * Fetch live exchange rates (Stub).
+     */
+    public function fetchLiveRates(string $baseCode = 'USD'): bool
+    {
+        // In a real scenario, fetch from API
+        // $rates = Http::get(...)->json();
+        
+        // Log for now
+        \Illuminate\Support\Facades\Log::info("CurrencyService: Live rates update triggered for base {$baseCode}.");
+        
+        return true;
     }
 
     protected function preparePayload(array $data): array

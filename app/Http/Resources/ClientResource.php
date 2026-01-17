@@ -22,6 +22,13 @@ class ClientResource extends JsonResource
             'phone' => $this->phone,
             'city' => $this->city,
             'country' => $this->country,
+            'sales_rep' => $this->salesRep ? [
+                'id' => $this->salesRep->id,
+                'name' => $this->salesRep->fullname,
+                'phone' => $this->salesRep->phone,
+                'email' => $this->salesRep->email,
+                'photo_url' => null, // Legacy doesn't show photo path in tbm_sales dump
+            ] : null,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

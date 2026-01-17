@@ -70,4 +70,15 @@ class Client extends Authenticatable
     {
         return $this->belongsTo(PriceList::class);
     }
+
+    public function salesRep(): BelongsTo
+    {
+        return $this->belongsTo(SalesRep::class, 'sales_rep_id');
+    }
+
+    public function customProductPrices(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'tbm_products_client', 'client_id', 'products_id')
+            ->withPivot('price');
+    }
 }

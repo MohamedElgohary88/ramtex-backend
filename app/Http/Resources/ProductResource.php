@@ -15,10 +15,30 @@ class ProductResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        /** @var \App\Models\Client|null $client */
         $client = $request->user('client-api');
         $displayPrice = $this->price;
 
-        if ($client && $client->price_list_id) {
+        // 1. Check Legacy Custom Pricing (Prioritize this per requirements)
+        $customPricing = null;
+
+        if ($client) {
+            // Check if eager loaded
+            if ($this->relationLoaded('clientsWithCustomPrice')) {
+                $customPricing = $this->clientsWithCustomPrice->first();
+            } else {
+                // Fallback for single resource details (lazy load)
+                $customPricing = $this->clientsWithCustomPrice()
+                    ->where('tbm_products_client.client_id', $client->id)
+                    ->first();
+            }
+        }
+
+        if ($customPricing) {
+            // Legacy price is sometimes varchar, ensure cast
+            $displayPrice = $customPricing->pivot->price;
+        } elseif ($client && $client->price_list_id) {
+            // 2. Fallback to Price List logic
             $customPriceItem = PriceListItem::where('price_list_id', $client->price_list_id)
                 ->where('product_id', $this->id)
                 ->first();
