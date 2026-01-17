@@ -126,4 +126,36 @@ class OrderController extends Controller
             ],
         ], 200);
     }
+
+    /**
+     * GET /api/client/orders/{id}
+     *
+     * Retrieve a single order detail.
+     * Enforces ownership check (Client can only see their own orders).
+     *
+     * @param  Request  $request
+     * @param  string   $id
+     * @return JsonResponse
+     */
+    public function show(Request $request, string $id): JsonResponse
+    {
+        /** @var Client $client */
+        $client = $request->user('client-api');
+
+        // Find invoice scoped to this client
+        $invoice = $client->invoices()
+            ->with(['items.product', 'items.product.category', 'items.product.brand'])
+            ->where('id', $id)
+            ->first();
+
+        if (! $invoice) {
+            return response()->json([
+                'message' => 'Order not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => new InvoiceResource($invoice),
+        ], 200);
+    }
 }

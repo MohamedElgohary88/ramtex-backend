@@ -27,6 +27,7 @@ Route::middleware('auth:client-api')->prefix('client')->group(function () {
     // Orders
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
     
     // Favorites / Wishlist
     Route::post('/favorites', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
